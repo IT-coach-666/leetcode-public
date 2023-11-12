@@ -1,10 +1,11 @@
-version = "0.0.1"
-print("-" * 50)
-print("【leetcode_jy: version-%s】" % version)
-print("【语雀知识库: www.yuque.com/it-coach】")
-print("-" * 50)
 
 """
+该脚本功能:
+1) 创建该项目的目录结构
+2) 统计汇总各题目的属性(难度系数、题目类型)
+
+
+
 # jy: 以下的设置使得能正常在当前文件中基
 #     于 leetcode_jy 包导入相应模块
 import os
@@ -24,13 +25,7 @@ import os
 def num_format(num):
     return "{0:0>4}".format(num)
 
-def generate_dir_file(is_statistic=False):
-    """
-    创建项目的目录结构和文件
-
-    如果 is_statistic 为 True, 则该函数的功能为:
-    统计汇总各题目的属性 (难度系数、题目类型)
-    """
+def generate_dir_file():
     max_num = 2500
     first_step = 500
     sec_step = 50
@@ -60,5 +55,6 @@ def generate_dir_file(is_statistic=False):
                     print("创建空文件: %s" % f_name)
                     os.mknod(f_name)
 
-#generate_dir_file()
+generate_dir_file()
+
 
