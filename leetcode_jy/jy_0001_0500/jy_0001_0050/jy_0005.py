@@ -183,4 +183,3 @@ s = "abc1234321ab"
 res = Solution().longestPalindrome_v3(s)
 print(res, len(res))
 
-

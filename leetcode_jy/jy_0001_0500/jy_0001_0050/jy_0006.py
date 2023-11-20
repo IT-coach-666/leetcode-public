@@ -12,7 +12,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Zigzag-Conversion(string)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "巧用 flag | 根据题目特点寻找技巧"
 
 
 
@@ -95,9 +95,6 @@ class Solution:
         return "".join(res)
 
 
-
-
-
 s = "PAYPALISHIRING"
 numRows = 3
 res = Solution().convert_v1(s, numRows)
@@ -115,6 +112,5 @@ numRows = 1
 res = Solution().convert_v1(s, numRows)
 # jy: "A"
 print(res)
-
 
 
