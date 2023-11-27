@@ -60,6 +60,7 @@ def generate_dir_file(is_statistic=False):
     max_num = 2500
     first_step = 500
     sec_step = 50
+    ls_all_info = []
     # jy: 一级目录
     for i in range(0, max_num, first_step):
         # jy: 一级目录名
@@ -96,11 +97,40 @@ def generate_dir_file(is_statistic=False):
                 if is_statistic:
                     ls_info = get_statistic(f_name)
                     if ls_info:
-                        print(ls_info)
+                        #print(ls_info)
+                        ls_all_info.append(ls_info)
+    return ls_all_info
+
+
+def get_undo_num(ls_done_info, start=1, end=None):
+    if not end:
+        end = int(ls_done_info[-1][0])
+
+    ls_done_num = [int(ls_info[0]) for ls_info in ls_done_info]
+    ls_done_half = ["%s-UNDO" % int(ls_info[0]) for ls_info in ls_done_info if "UNDO" in ls_info[-1]]
+    ls_range_num = [i for i in range(start, end)]
+
+    ls_undo_num = [i for i in ls_range_num if i not in ls_done_num]
+
+    return ls_undo_num + ls_done_half
+
 
 if __name__ == "__main__":
+    # jy: 1) 创建项目目录结构 -----------------------------------
     #generate_dir_file()
-    generate_dir_file(is_statistic=True)
 
+    # jy: 2) 打印输出已完成的题目以及相关信息 -------------------
+    #"""
+    ls_all_info = generate_dir_file(is_statistic=True)
+    print("\n".join([str(ls_info) for ls_info in ls_all_info]))
+    #"""
+
+    # jy 3) 输出指定范围内的 UNDO 题目 --------------------------
+    """
+    ls_all_info = generate_dir_file(is_statistic=True)
+    #ls_undo_num = get_undo_num(ls_all_info)
+    ls_undo_num = get_undo_num(ls_all_info, start=1, end=20)
+    print(ls_undo_num)
+    """
 
 
