@@ -34,8 +34,6 @@ A solution set is:
 """
 
 
-
-from typing import List
 class Solution:
     """
 解法 1 (超时): a + b + c = 0 等价于 b + c = -a, 所以问题就转化为
@@ -117,7 +115,7 @@ class Solution:
    元素的下标小于 k, 记为 k', 则这个组合已经在外层循环到 k' 时就已经找到
    了这个组合, 所以无需再次处理
 
-最好能自己实现高效的排序算法
+涉及到的排序算法最好能自己实现
     """
     def threeSum_v2(self, nums: List[int]) -> List[List[int]]:
         # jy: 对数组进行排序
@@ -139,20 +137,21 @@ class Solution:
             if i-1 >= 0 and nums[i] == nums[i-1]:
                 continue
 
-            # jy: target 为剩余 2 数之和; 剩余 2 数从 i+1 到 len(nums)-1 的
-            #     下标中找
+            # jy: target 为剩余两数之和; 剩余两数从 i+1 到 len(nums)-1 的
+            #     下标中找 (双指针即初始化为这两个下标)
             target = - nums[i]
-            # jy: 双指针
             low, high = i+1, len(nums)-1
             while low < high:
                 # jy: 如果两值相等, 则将符合要求的 3 数列表加入 sums 列表组合中
                 if nums[low] + nums[high] == target:
                     sums.append([- target, nums[low], nums[high]])
+
                     # jy: 跳过相同的数值, 避免重复计算
                     while low < high and nums[low] == nums[low+1]:
                         low += 1
                     while low < high and nums[high] == nums[high-1]:
                         high -= 1
+
                     low += 1
                     high -= 1
                 elif nums[low] + nums[high] < target:
