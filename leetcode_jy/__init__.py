@@ -1,7 +1,9 @@
 version = "0.0.1"
+url_ = "www.yuque.com/it-coach"
+project_name = "leetcode_jy"
 print("-" * 50)
-print("【leetcode_jy: version-%s】" % version)
-print("【语雀知识库: www.yuque.com/it-coach】")
+print("【%s: version-%s】" % (project_name, version))
+print("【语雀知识库: %s】" % url_)
 print("-" * 50)
 
 """
