@@ -17,6 +17,14 @@ from leetcode_jy import *
 #from leetcode_jy.jy_utils import test_name
 #print("============= ", test_name)
 
+#=============================================================================
+题目类型: 
+array_dim_1
+array_dim_2
+linked_list
+string
+number
+
 """
 
 import os
@@ -47,15 +55,16 @@ def get_statistic(f_name):
             if line.startswith("tag_jy"):
                 tag_jy = line.split("=")[-1].strip("\"\' \n")
             if type_jy and title_jy and q_type and tag_jy:
-                return [obj_num, type_jy, q_type, title_jy, tag_jy]
+                return [obj_num, type_jy, q_type, title_jy, tag_jy, f_name]
     return []
 
-def generate_dir_file(is_statistic=False):
+def generate_dir_file(is_statistic=False, num_=0):
     """
     创建项目的目录结构和文件
 
-    如果 is_statistic 为 True, 则该函数的功能为:
-    统计汇总各题目的属性 (难度系数、题目类型)
+    is_statistic: 如果 is_statistic 为 True, 则该函数的功能为
+                  统计汇总各题目的属性 (难度系数、题目类型)
+    num_: 如果传入了 num_, 则返回指定题目的路径
     """
     max_num = 2500
     first_step = 500
@@ -99,6 +108,10 @@ def generate_dir_file(is_statistic=False):
                     if ls_info:
                         #print(ls_info)
                         ls_all_info.append(ls_info)
+                if num_:
+                    if k+1 == num_:
+                        print(f_name)
+                        return
     return ls_all_info
 
 
@@ -133,4 +146,9 @@ if __name__ == "__main__":
     print(ls_undo_num)
     """
 
+    # jy: 4) 基于题目号找题目路径
+    """
+    num_ = 167
+    generate_dir_file(num_=num_)
+    """
 

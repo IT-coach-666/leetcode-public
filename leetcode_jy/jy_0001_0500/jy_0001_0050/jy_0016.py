@@ -12,7 +12,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "3Sum-closest(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = "类似 0015（）"
+tag_jy = "类似 0015（条件略作转换: 与目标值的差值最小为目标）"
 
 
 
@@ -41,95 +41,62 @@ class Solution:
         nums.sort()
         min_diff = sys.maxsize
         n = len(nums)
+        ans = -1
         # jy: 遍历 nums 至倒数第三个元素 (遍历至倒数第三个元素时, 对应的
         #     双指针即为最后两个数值)
         for i in range(n - 2):
-            # jy: 优化 1
-            if i and nums[i] == nums[i - 1]:
-                continue
-
-            # jy: 记录 two sum 的最优目标值 k (two sum 越接近 k 值越好),
-            #     后续双指针需基于该值进行移动
-            k = target - nums[i]
-            low, high = i+1, n-1
-            while low < high:
-                # jy: 计算 3 数之和与目标值之间的差值
-                diff = nums[i] + nums[low] + nums[high] - target
-                # jy: 如果差值小于已知差值的最小差值 (注意是绝对值之间进
-                #     行比较), 则更新最小差值 (更新时是更新原值, 而非绝对值)
-                if abs(diff) < abs(min_diff):
-                    min_diff = diff
-
-                # jy: 如果当前 2 数之和等于最优目标值 k, 则直接退出循环
-                if nums[low] + nums[high] == k:
-                    return target + min_diff
-
-                # jy: 如果小于 k, 则 low 指针往前移, 如果大于 k, 则 high 指针
-                #     往左移, 使得两数之和往接近最优目标值的方向靠
-                if nums[low] + nums[high] < k:
-                    low += 1
-                else:
-                    high -= 1
-        # jy: 最后返回的目标值与最小差值的和即为最接近的值;
-        return target + min_diff
-
-
-    def threeSumClosest_v2(self, nums: List[int], target: int) -> int:
-        nums.sort()
-        n = len(nums)
-        min_diff = sys.maxsize
-        for i in range(n - 2):
-            # jy: 如果当前数值与前一数值相同, 则跳过, 防止重复计算
+            # jy: 优化 1: 如果当前数值与前一数值相同, 则跳过, 防止重复计算
             if i and nums[i] == nums[i-1]:
-                continue 
-
-            # jy: 如果后三个数的值大于目标值 target, 则可终止后续的遍历, 因
-            #     为后续的三个数的值只会更大; 同时需判断当前的后三个数之和与
-            #     目标值的差是否更小, 如果是, 则更新最终结果为当前三个数之和
-            s = nums[i] + nums[i+1] + nums[i+2]
-            if s > target: 
-                if s - target < min_diff:
-                    ans = s 
-                break
-
-            # jy: 如果当前数值与最后两个数的和仍小于目标值, 则当前数值加上其后
-            #     的两个数只会更小, 包含当前数值的三个数中, 剩余两个数为最后两
-            #     个较大的数时是更接近目标值的, 此时判断与目标值之差是否更小,
-            #     如果更小则更新最终结果为这三数之和
-            s = nums[i] + nums[-2] + nums[-1]
-            if s < target: 
-                if target - s < min_diff:
-                    min_diff = target - s
-                    ans = s
                 continue
 
-            # 双指针
+            # jy: 优化 2: 如果后三个数的值大于目标值 target, 则可终止后续的
+            #     遍历, 因为后续的三个数的值只会更大; 同时需判断当前的后三
+            #     个数之和与目标值的差是否更小, 如果是则直接返回
+            s3num = nums[i] + nums[i+1] + nums[i+2]
+            if s3num > target:
+                diff = s3num - target
+                if diff < min_diff:
+                    return s3num
+
+            # jy: 优化 3: 如果当前数值与最后两个数的和仍小于目标值, 则当前数值
+            #     加上其后的两个数只会更小, 包含当前数值的三个数中, 剩余两个数
+            #     为最后两个较大的数时是更接近目标值的, 此时判断与目标值之差是
+            #     否更小, 如果更小则更新最终结果为这三数之和
+            s3num = nums[i] + nums[-2] + nums[-1]
+            if s3num < target:
+                diff = target - s3num
+                if diff < min_diff:
+                    min_diff = diff
+                    ans = s3num
+                continue
+
+            # jy: 双指针, 基于双指针找出两数与当前数组成三数之和, 并计算其结果
+            #     与目标值的差距, 如果与目标值相等, 则直接返回; 否则计算与目标
+            #     的差距, 差距更小时, 则更新相应指针和最终返回结果
             low, high = i+1, n-1
             while low < high:
-                s = nums[i] + nums[low] + nums[high]
-                if s == target:
-                    return s
-                if s > target:
-                    if s - target < min_diff:  # s 与 target 更近
-                        min_diff = s - target
-                        ans = s
+                s3num = nums[i] + nums[low] + nums[high]
+                if s3num == target:
+                    return s3num
+                elif s3num > target:
+                    diff = s3num - target
+                    if diff < min_diff:
+                        min_diff = diff
+                        ans = s3num
                     high -= 1
-                else:  # s < target
-                    if target - s < min_diff:  # s 与 target 更近
-                        min_diff = target - s
-                        ans = s
+                else:
+                    diff = target - s3num
+                    if diff < min_diff:
+                        min_diff = diff
+                        ans = s3num
                     low += 1
         return ans
+
 
 
 nums = [-1, 2, 1, -4]
 target = 1
 res = Solution().threeSumClosest_v1(nums, target)
 print(nums, " === ", target, " === ", res )
-
-
-res = Solution().threeSumClosest_v2(nums, target)
-print(nums, " === ", target, " === ", res )
-
 
 
