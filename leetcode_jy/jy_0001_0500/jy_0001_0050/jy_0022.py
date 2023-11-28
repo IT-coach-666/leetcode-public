@@ -107,17 +107,46 @@ class Solution:
         dfs(cur_str, 0, 0, n)
         return res
 
+    """
+解法 3: 动态规划
+
+此题中动态规划的思想类似于数学归纳法: 当知道所有 i < n 的情况时, 可以通过某种
+算法算出 i=n 的情况
+
+本题核心: 考虑 i = n 时相比 n-1 组括号增加的那一组括号的位置
+
+当获得所有 i < n 时括号的可能生成排列后, 对于 i = n 的情况, 考虑到整个括号排
+列中最左边的括号一定是左括号, 它可以和它对应的右括号组成一组完整的括号 "( )",
+我们认为这一组是相比 n - 1 增加进来的括号
+
+重点: 剩下 n-1 组括号有可能在哪? 要么在这一组新增的括号内部, 要么在这一组新增
+括号的外部 (右侧); 知道 i<n 的情况后可以对所有情况进行遍历:
+    "(" +【i=p 时所有括号的排列组合】 + ")" +【i=q 时所有括号的排列组合】
+其中 p + q = n-1, 且 p 和 q 均为非负整数
+
+事实上, 当 p 从 0 取到 n-1, q 从 n-1 取到 0 后, 所有情况就遍历完了
+
+上述遍历没有重复情况出现, 即当 (p1,q1)≠(p2,q2) 时, 按上述方式取的括号组合一
+定不同
+    """
     def generateParenthesis_v3(self, n: int) -> List[str]:
         if n == 0:
             return []
         total_l = []
-        total_l.append([None])    # 0组括号时记为None
-        total_l.append(["()"])    # 1组括号只有一种情况
-        for i in range(2,n+1):    # 开始计算i组括号时的括号组合
-            l = []        
-            for j in range(i):    # 开始遍历 p q ，其中p+q=i-1 , j 作为索引
-                now_list1 = total_l[j]    # p = j 时的括号组合情况
-                now_list2 = total_l[i-1-j]    # q = (i-1) - j 时的括号组合情况
+        # jy: 0 组括号时记为 None
+        total_l.append([None])
+        # jy: 1 组括号只有一种组成情况
+        total_l.append(["()"]) 
+        # jy: 开始计算 i 组括号时的括号组合
+        for i in range(2, n+1):
+            # jy: 记录 i 组括号的所有情况
+            l_i = []
+            # jy: 开始遍历 p 和 q, 其中 p + q = i - 1, j 作为索引
+            for j in range(i):
+                # jy: p = j 时的括号组合情况
+                now_list1 = total_l[j]
+                # jy: q = (i-1) - j 时的括号组合情况
+                now_list2 = total_l[i-1-j]
                 for k1 in now_list1:  
                     for k2 in now_list2:
                         if k1 == None:
@@ -125,8 +154,10 @@ class Solution:
                         if k2 == None:
                             k2 = ""
                         el = "(" + k1 + ")" + k2
-                        l.append(el)    # 把所有可能的情况添加到 l 中
-            total_l.append(l)    # l这个list就是i组括号的所有情况，添加到total_l中，继续求解i=i+1的情况
+                        # jy: 把所有可能的情况添加到 l 中
+                        l_i.append(el)
+            # jy: 将i组括号的所有情况添加到 total_l 中
+            total_l.append(l_i)
         return total_l[n]
 
 

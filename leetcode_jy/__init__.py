@@ -116,8 +116,41 @@ def generate_dir_file(is_statistic=False, num_=0):
                         return
     return ls_all_info
 
+def add_prefix2file(f_name):
+    """
+    向文件中写入前缀部分
+    """
+
+    prefix = """
+# jy: 以下的设置使得能正常在当前文件中基
+#     于 leetcode_jy 包导入相应模块
+import os
+import sys
+abs_path = os.path.abspath(__file__)
+dir_project = os.path.join(abs_path.split("leetcode_jy")[0], "leetcode_jy")
+sys.path.append(dir_project)
+from leetcode_jy import *
+assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
+       url_ == "www.yuque.com/it-coach"
+from typing import List, Dict
+# jy: 记录该题的难度系数
+type_jy = ""
+# jy: 记录该题的英文简称以及所属类别
+title_jy = "(array_dim_1)"
+# jy: 记录不同解法思路的关键词
+tag_jy = ""
+"""
+    with io.open(f_name, "w", ) as f_:
+        pass
+
 
 def get_undo_num(ls_done_info, start=1, end=None):
+    """
+    获取未完成的题目
+
+    传入参数:
+    ls_done_info: 已完成的题目的相关信息
+    """
     if not end:
         end = int(ls_done_info[-1][0])
 
@@ -135,10 +168,10 @@ if __name__ == "__main__":
     #generate_dir_file()
 
     # jy: 2) 打印输出已完成的题目以及相关信息 -------------------
-    #"""
+    """
     ls_all_info = generate_dir_file(is_statistic=True)
     print("\n".join([str(ls_info) for ls_info in ls_all_info]))
-    #"""
+    """
 
     # jy 3) 输出指定范围内的 UNDO 题目 --------------------------
     """
@@ -149,8 +182,8 @@ if __name__ == "__main__":
     """
 
     # jy: 4) 基于题目号找题目路径
-    """
-    num_ = 167
+    #"""
+    num_ = 771
     generate_dir_file(num_=num_)
-    """
+    #"""
 

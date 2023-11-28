@@ -78,21 +78,21 @@ class Solution:
         # jy: 创建哑节点作为结果链表的开头
         dummy = ListNode(0)
         # jy: 游标标识结果链表的结尾
-        move = dummy
+        prev = dummy
         # jy: l1 和 l2 都未遍历结束
         while l1 and l2:
             # jy: 如果 l1 的数值比较小, 则把 l1 头部节点拼接到结果链表的结
             #     尾, 并将 l1 移至下一节点; 如果 l2 的数值比较小, 同理
             if l1.val <= l2.val:
-                move.next = l1
+                prev.next = l1
                 l1 = l1.next
             else:
-                move.next = l2
+                prev.next = l2
                 l2 = l2.next
             # jy: 移动结果链表的结尾指针
-            move = move.next
+            prev = prev.next
         # jy: 将 l1 或 l2 尚未使用完的部分拼接到结果链表的最后
-        move.next = l1 if l1 else l2
+        prev.next = l1 if l1 else l2
         # jy: 返回哑节点的下一个位置 (即结果链表的头节点)
         return dummy.next
 
