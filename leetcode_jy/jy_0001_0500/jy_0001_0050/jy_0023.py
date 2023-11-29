@@ -10,7 +10,7 @@ assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
        url_ == "www.yuque.com/it-coach"
 from typing import List, Dict
 # jy: 记录该题的难度系数
-type_jy = ""
+type_jy = "H"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "merge-k-sorted-lists(linked_list)"
 # jy: 记录不同解法思路的关键词
@@ -19,7 +19,7 @@ tag_jy = ""
 
 
 """
-Merge k sorted linked lists and return it as one sorted list. 
+Merge `k` sorted linked lists and return it as one sorted list. 
 Analyze and describe its complexity.
 
 Example:
@@ -29,38 +29,51 @@ Input:
   2->6]
 Output: 1->1->2->3->4->4->5->6
 """
-# ===============================================================
-from typing import List
+
 import heapq             
-from about_ListNode import *
+from leetcode_jy.utils_jy.about_ListNode import ListNode, getListNodeFromList
+from leetcode_jy.utils_jy.about_ListNode import getLen, getTailNode, showLnValue
 
 
 class Solution:
     """
-解法1: 021_merge-two-sorted-lists.py 的升级版, 由原来的 2 个有序链表变为了 k 个; 这道
-题类似于``归并排序``, 采用分治的思想, 将数组分成两个子数组, 对每个子数组进行链表排序, 排
-序后的两个子数组分别返回一个链表, 然后对这两个链表进行排序, 而对两个链表排序就可以复
-用 021_merge-two-sorted-lists.py 的代码; 每一次递归调用时, 当前数组会被分成 2 个子数组
-处理, 记数组的长度为 n, 则递归的深度是 lg(n), 而每一层递归需要排序的链表结点数为所有链
-表的结点数的和, 记为 k, 所以算法的时间复杂度为 O(k*lg(n)), 空间复杂度为 O(1);
+解法 1: 0021(merge-two-sorted-lists) 的升级版, 由原来的 2 个有序链表变为 k 个
+
+类似归并排序, 可采用分治思想, 将数组分成两个子数组, 对每个子数组进行链表排序,
+排序后的两个子数组分别返回一个链表, 然后对这两个链表进行排序, 而对两个链表排
+序就可以复用 0021 的代码; 每一次递归调用时, 当前数组会被分成 2 个子数组处理,
+记数组的长度为 n, 则递归的深度是 lg(n), 而每一层递归需要排序的链表结点数为所
+有链表的结点数的和, 记为 k, 所以算法时间复杂度为 O(k*lg(n)), 空间复杂度为 O(1)
     """
     def mergeKLists_v1(self, lists: List[ListNode]) -> ListNode:
         return self._merge(lists, 0, len(lists)-1)
 
     def _merge(self, lists: List[ListNode], low: int, high: int) -> ListNode:
-        # jy: 如果 low 大于 high, 返回 None, 则终止递归;
+        """
+        对链表数组 lists[low: high+1] 进行有序合并, 返回一个合并后的链表
+
+        lists: 链表数组
+        low: 链表数组的起始下标
+        high: 链表数组的末尾下标
+        """
+        # jy: 如果 low > high, 返回 None, 终止递归
         if low > high:
             return None
+        # jy: 如果 low == high, 表明待合并的链表只有一个, 直接返回
         if low == high:
             return lists[low]
 
         middle = (low + high) // 2
-        list1, list2 = self._merge(lists, low, middle), self._merge(lists, middle+1, high)
-        return self._merge_two_lists(list1, list2)
+        # jy: 采用分治思想, 将待合并的链表数组拆分为更小的待合并链表子数组
+        #     _merge 方法递归处理, 最终返回的是一个合并后的链表
+        list_node1 = self._merge(lists, low, middle)
+        list_node2 = self._merge(lists, middle+1, high)
+        # jy: 对两个有序链表进行合并
+        return self._merge_two_lists(list_node1, list_node2)
 
     def _merge_two_lists(self, l1: ListNode, l2: ListNode) -> ListNode:
         """
-        合并两个有序链表, 同 021_merge-two-sorted-lists.py
+        合并两个有序链表, 同 0021 (也可基于递归方式实现)
         """
         dummy = ListNode(-1)
         prev = dummy
@@ -74,6 +87,21 @@ class Solution:
             prev = prev.next
         prev.next = l1 or l2
         return dummy.next
+
+
+    """
+解法 2: 同解法 1, 但在主函数中进行递归
+    """
+    def mergeKLists_v2(self, lists: List[ListNode]) -> ListNode:
+        if not lists:
+            return None
+        if len(lists) == 1:
+            return lists[0]
+
+        mid = len(lists) // 2
+        list_node1 = self.mergeKLists_v2(lists[:mid])
+        list_node2 = self.mergeKLists_v2(lists[mid:])
+        return self._merge_two_lists(list_node1, list_node2)
 
 
     """
@@ -93,7 +121,7 @@ max{O(n), O(k*lg(n))}, 当 k 大于 n 时, 时间复杂度简化为 O(k*lg(n));
 
 额外的空间消耗为构建优先队列, 故空间复杂度为 O(n);
     """
-    def mergeKLists_v2(self, lists: List[ListNode]) -> ListNode:
+    def mergeKLists_v3(self, lists: List[ListNode]) -> ListNode:
         # jy: node 为一个有序链表的头结点, 此处对有序链表的头结点进行封装, 并放到队列中;
         queue = [ListNodeWrap(node) for node in lists if node]
         # jy: 使列表具有堆特性;
@@ -114,39 +142,6 @@ max{O(n), O(k*lg(n))}, 当 k 大于 n 时, 时间复杂度简化为 O(k*lg(n));
             if node.next:
                 heapq.heappush(queue, ListNodeWrap(node.next))
         return dummy.next
-
-    """
-JY: 将有序链表先转为有序数组, 排序后的有序数组再转为链表即可;
-以下仅以有序数组为例进行实现;
-    """
-    def mergeKLists_jy(self, lists: List[ListNode]) -> ListNode:
-        if len(lists) == 1:
-            return lists[0]
-
-        mid = len(lists) // 2
-        left = self.mergeKLists_jy(lists[: mid])
-        right = self.mergeKLists_jy(lists[mid:])
-        return self.merge_two_list(left, right)
-
-    def merge_two_list(self, list1, list2):
-        i = 0
-        j = 0
-        merged = []
-        while i < len(list1) and j < len(list2):
-            if list1[i] <= list2[j]:
-                merged.append(list1[i])
-                i += 1
-            else:
-                merged.append(list2[j])
-                j += 1
-
-        if i < len(list1):
-            merged += list1[i:]
-        elif j < len(list2):
-            merged += list2[j:]
-
-        return merged
-
 
 
 class ListNodeWrap:
@@ -176,7 +171,6 @@ print("ln2 ============: ")
 showLnValue(ln2)
 print("ln3 ============: ")
 showLnValue(ln3)
-
 ls_ln = [ln1, ln2, ln3]
 res_ln = Solution().mergeKLists_v1(ls_ln)
 print("res_ln ============: ")
@@ -190,16 +184,20 @@ ls3 = [2, 6]
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
 ln3 = getListNodeFromList(ls3)
-
 ls_ln = [ln1, ln2, ln3]
 res_ln = Solution().mergeKLists_v2(ls_ln)
 print("res_ln ============: ")
 showLnValue(res_ln)
 
+
 ls_ = [[1,4,5],[1,3,4],[2,6]]
-# [1,1,2,3,4,4,5,6]
-res = Solution().mergeKLists_jy(ls_)
-print(res)
+ln1 = getListNodeFromList(ls_[0])
+ln2 = getListNodeFromList(ls_[1])
+ln3 = getListNodeFromList(ls_[2])
+ls_ln = [ln1, ln2, ln3]
+res = Solution().mergeKLists_v3(ls_ln)
+print("res_ln ============: ")
+showLnValue(res_ln)
 
 
 

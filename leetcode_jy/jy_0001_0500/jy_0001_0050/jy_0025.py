@@ -33,7 +33,8 @@ Note:
 • You may not alter the values in the list's nodes, only nodes itself may be changed.
 """
 
-from about_ListNode import *
+from leetcode_jy.utils_jy.about_ListNode import ListNode, getListNodeFromList
+from leetcode_jy.utils_jy.about_ListNode import getLen, getTailNode, showLnValue
 
 class Solution:
     """

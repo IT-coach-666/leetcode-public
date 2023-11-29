@@ -26,8 +26,9 @@ Example:
 Given 1->2->3->4, you should return the list as 2->1->4->3.
 """
 
+from leetcode_jy.utils_jy.about_ListNode import ListNode, getListNodeFromList
+from leetcode_jy.utils_jy.about_ListNode import getLen, getTailNode, showLnValue
 
-from about_ListNode import *
 
 class Solution:
     """
