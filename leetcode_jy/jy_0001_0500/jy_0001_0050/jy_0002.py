@@ -139,20 +139,13 @@ ls2 = [5, 6, 4]
 # jy: 构造链表数据结构, 供测试使用
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
-
-print("ListNode1 :")
-showLnValue(ln1)
-print("ListNode2 :")
-showLnValue(ln2)
-
-
+showLnValue(ln1, "ListNode1")
+showLnValue(ln2, "ListNode2")
 res = Solution().addTwoNumbers(ln1, ln2)
-print("ListNode1 + ListNode2 :")
-showLnValue(res)
+showLnValue(res, "ListNode1 + ListNode2")
 
 res = Solution().addTwoNumbers_jy(ln1, ln2)
-print("ListNode1 + ListNode2 :")
-showLnValue(res)
+showLnValue(res, "ListNode1 + ListNode2")
 
 
 print("=" * 50)
@@ -161,13 +154,10 @@ ls1 = [2, 4, 3]
 ls2 = [5, 6, 8]
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
-print("ListNode1 :")
-showLnValue(ln1)
-print("ListNode2 :")
-showLnValue(ln2)
+showLnValue(ln1, "ListNode1")
+showLnValue(ln2, "ListNode2")
 res = Solution().addTwoNumbers_jy(ln1, ln2)
-print("ListNode1 + ListNode2 :")
-showLnValue(res)
+showLnValue(res, "ListNode1 + ListNode2")
 
 
 print("=" * 50)
@@ -176,14 +166,10 @@ ls1 = [2, 4, 3, 6]
 ls2 = [5, 6, 8]
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
-print("ListNode1 :")
-showLnValue(ln1)
-print("ListNode2 :")
-showLnValue(ln2)
+showLnValue(ln1, "ListNode1")
+showLnValue(ln2, "ListNode2")
 res = Solution().addTwoNumbers_jy(ln1, ln2)
-print("ListNode1 + ListNode2 :")
-showLnValue(res)
-
+showLnValue(res, "ListNode1 + ListNode2")
 
 print("=" * 50)
 
@@ -191,13 +177,11 @@ ls1 = [2, 4, 3]
 ls2 = [5, 6, 8, 6]
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
-print("ListNode1 :")
-showLnValue(ln1)
-print("ListNode2 :")
-showLnValue(ln2)
+showLnValue(ln1, "ListNode1")
+showLnValue(ln2, "ListNode2")
 res = Solution().addTwoNumbers_jy(ln1, ln2)
-print("ListNode1 + ListNode2 :")
-showLnValue(res)
+showLnValue(res, "ListNode1 + ListNode2")
+
 
 print("=" * 50)
 
@@ -205,11 +189,8 @@ ls1 = [2, 4, 3]
 ls2 = [5, 6, 8, 9, 4]
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
-print("ListNode1 :")
-showLnValue(ln1)
-print("ListNode2 :")
-showLnValue(ln2)
+showLnValue(ln1, "ListNode1")
+showLnValue(ln2, "ListNode2")
 res = Solution().addTwoNumbers_jy(ln1, ln2)
-print("ListNode1 + ListNode2 :")
-showLnValue(res)
+showLnValue(res, "ListNode1 + ListNode2")
 

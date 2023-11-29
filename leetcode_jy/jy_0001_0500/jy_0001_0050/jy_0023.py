@@ -173,16 +173,12 @@ ls3 = [2, 6]
 ln1 = getListNodeFromList(ls1)
 ln2 = getListNodeFromList(ls2)
 ln3 = getListNodeFromList(ls3)
-print("ln1 ============: ")
-showLnValue(ln1)
-print("ln2 ============: ")
-showLnValue(ln2)
-print("ln3 ============: ")
-showLnValue(ln3)
+showLnValue(ln1, "ln1")
+showLnValue(ln2, "ln2")
+showLnValue(ln3, "ln3")
 ls_ln = [ln1, ln2, ln3]
 res_ln = Solution().mergeKLists_v1(ls_ln)
-print("res_ln ============: ")
-showLnValue(res_ln)
+showLnValue(res_ln, "res_ln")
 
 
 ls1 = [1, 4, 5]
@@ -193,8 +189,7 @@ ln2 = getListNodeFromList(ls2)
 ln3 = getListNodeFromList(ls3)
 ls_ln = [ln1, ln2, ln3]
 res_ln = Solution().mergeKLists_v2(ls_ln)
-print("res_ln ============: ")
-showLnValue(res_ln)
+showLnValue(res_ln, "res_ln")
 
 
 ls_ = [[1,4,5],[1,3,4],[2,6]]
@@ -203,8 +198,7 @@ ln2 = getListNodeFromList(ls_[1])
 ln3 = getListNodeFromList(ls_[2])
 ls_ln = [ln1, ln2, ln3]
 res = Solution().mergeKLists_v3(ls_ln)
-print("res_ln ============: ")
-showLnValue(res_ln)
+showLnValue(res_ln, "res_ln")
 
 
 

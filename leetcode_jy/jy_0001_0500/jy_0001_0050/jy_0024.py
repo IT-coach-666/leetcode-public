@@ -19,8 +19,9 @@ tag_jy = ""
 
 
 """
-Given a linked list, swap every two adjacent nodes and return its head.
-You may not modify the values in the list's nodes, only nodes itself may be changed.
+Given a linked list, swap every two adjacent nodes and return its head. You
+may not modify the values in the list's nodes, only nodes itself may be changed.
+
 
 Example:
 Given 1->2->3->4, you should return the list as 2->1->4->3.
@@ -92,23 +93,20 @@ prev.next = current.next
         return h_next
 
 
+
 ls1 = [1, 2, 3, 4, 5]
 ln1 = getListNodeFromList(ls1)
-print("ln1 ============: ")
-showLnValue(ln1)
+showLnValue(ln1, "ln1")
 
 res_ln = Solution().swapPairs_v1(ln1)
-print("res_ln ============: ")
-showLnValue(res_ln)
+showLnValue(res_ln, "res_ln")
 
 
 ls1 = [1, 2, 3, 4]
 ln1 = getListNodeFromList(ls1)
-print("ln1 ============: ")
-showLnValue(ln1)
+showLnValue(ln1, "ln1")
 
 res_ln = Solution().swapPairs_v2(ln1)
-print("res_ln ============: ")
-showLnValue(res_ln)
+showLnValue(res_ln, "res_ln")
 
 

@@ -47,7 +47,7 @@ def getLen(ln_):
     return len_
 
 
-def showLnValue(head_):
+def showLnValue(head_, ln_name="ListNode"):
     """
     展示 ListNode 对象中的值 (不改变原有对象, 遍历后不将原有对象置
     于链尾)
@@ -59,7 +59,7 @@ def showLnValue(head_):
         tmp_ln = tmp_ln.next
     # jy: 仅对右侧去除 "->" 字符即可(即表示右侧如果有这两个字符中
     #     的其中一个, 都会去除)
-    print(str_.rstrip("->"))
+    print("%s: %s" % (ln_name, str_.rstrip("->")))
 
 
 def showCircleLnValue(head_):

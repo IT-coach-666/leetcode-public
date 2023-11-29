@@ -240,20 +240,20 @@ if __name__ == "__main__":
     '''
 
     # 从已完成的题目中搜索指定题目类型的题目 --------------------
-    '''
-    #ls_obj = ["字典", "双指针"]
-    ls_obj = ["string"]
+    #'''
+    #ls_obj = ["string"]
+    ls_obj = ["linked_list"]
     ls_obj_info = get_tag_num(ls_all_info, ls_obj, obj="type")
     print("\n".join([str(ls_info) for ls_info in ls_obj_info]))
-    '''
+    #'''
 
     # 从已完成的题目中搜索指定难度等级的题目 --------------------
-    #'''
+    '''
     #ls_obj = ["字典", "双指针"]
     ls_obj = ["M"]
     ls_obj_info = get_tag_num(ls_all_info, ls_obj, obj="level")
     print("\n".join([str(ls_info) for ls_info in ls_obj_info]))
-    #'''
+    '''
     #"""
 
     # jy 3) 输出指定范围内的 UNDO 题目 ================================================
