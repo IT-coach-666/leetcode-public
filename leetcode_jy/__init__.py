@@ -60,14 +60,25 @@ def get_statistic(f_name):
                 return [obj_num, type_jy, q_type, title_jy, tag_jy, f_name]
     return []
 
-def generate_dir_file(is_statistic=False, num_=0):
+def generate_dir_file(type_=""):
     """
     创建项目的目录结构和文件
 
-    is_statistic: 如果 is_statistic 为 True, 则该函数的功能为
-                  统计汇总各题目的属性 (难度系数、题目类型)
-    num_: 如果传入了 num_, 则返回指定题目的路径
+    type_ 参数取值如下:
+    "get_statistic": 统计汇总各题目的属性 (难度系数、题目类型)
+    "write_prefix": 向空文件中写入公共前缀部分
+    整数数值: 返回指定题目的路径
     """
+    # jy: 判断 type_ 的有效性
+    if type_ in ["get_statistic", "write_prefix"]:
+        pass
+    elif isinstance(type_, int):
+        pass
+    else:
+        print("ERROR, 传入参数 type_ 不符合要求")
+        return
+
+
     max_num = 2500
     first_step = 500
     sec_step = 50
@@ -105,43 +116,57 @@ def generate_dir_file(is_statistic=False, num_=0):
                     print("创建空文件: %s" % f_name)
                     os.mknod(f_name)
                 # jy: 读取文件中的 "type_jy" 和 "title_jy" 变量值
-                if is_statistic:
+                if type_ == "get_statistic":
                     ls_info = get_statistic(f_name)
                     if ls_info:
                         #print(ls_info)
                         ls_all_info.append(ls_info)
-                if num_:
-                    if k+1 == num_:
+                elif type_ == "write_prefix":
+                    add_prefix2file(f_name)
+                elif isinstance(type_, int):
+                    if k+1 == type_:
                         print(f_name)
                         return
     return ls_all_info
 
+
+def get_file_bit(f_name):
+    """
+    获取文件大小, 以 bit 为单位
+    """
+    return os.stat(f_name).st_size
+
+
 def add_prefix2file(f_name):
     """
-    向文件中写入前缀部分
+    向文件中写入公共前缀部分
     """
+    ls_line = [
+        "# jy: 以下的设置使得能正常在当前文件中基",
+        "#     于 leetcode_jy 包导入相应模块",
+        "import os",
+        "import sys",
+        "abs_path = os.path.abspath(__file__)",
+        'dir_project = os.path.join(abs_path.split("leetcode_jy")[0], "leetcode_jy")',
+        "sys.path.append(dir_project)",
+        "from leetcode_jy import *",
+        'assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \\',
+        '       url_ == "www.yuque.com/it-coach"',
+        "from typing import List, Dict",
+        "# jy: 记录该题的难度系数",
+        'type_jy = ""',
+        "# jy: 记录该题的英文简称以及所属类别",
+        'title_jy = "(array_dim_1)"',
+        '# jy: 记录不同解法思路的关键词',
+        'tag_jy = ""'
+    ]
+    if get_file_bit(f_name) > 100:
+        print("【%s】文件中已有内容, 跳过" % f_name)
+        return 
 
-    prefix = """
-# jy: 以下的设置使得能正常在当前文件中基
-#     于 leetcode_jy 包导入相应模块
-import os
-import sys
-abs_path = os.path.abspath(__file__)
-dir_project = os.path.join(abs_path.split("leetcode_jy")[0], "leetcode_jy")
-sys.path.append(dir_project)
-from leetcode_jy import *
-assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
-       url_ == "www.yuque.com/it-coach"
-from typing import List, Dict
-# jy: 记录该题的难度系数
-type_jy = ""
-# jy: 记录该题的英文简称以及所属类别
-title_jy = "(array_dim_1)"
-# jy: 记录不同解法思路的关键词
-tag_jy = ""
-"""
-    with io.open(f_name, "w", ) as f_:
-        pass
+    with io.open(f_name, "w") as f_:
+        for line in ls_line:
+            f_.write(line + "\n")
 
 
 def get_undo_num(ls_done_info, start=1, end=None):
@@ -163,27 +188,85 @@ def get_undo_num(ls_done_info, start=1, end=None):
     return ls_undo_num + ls_done_half
 
 
+def get_tag_num(ls_done_info, ls_obj, obj="tag"):
+    """
+    ls_done_info: 已完成的题目信息
+    ls_obj: 目标标签列表或目标题目类型列表
+    obj: 可选值为 ["tag", "type", "level"] 中的一个
+        "tag": 基于标签进行搜索
+        "type": 基于题目类型进行搜索
+        "level": 基于难度等级进行搜索
+    """
+    allow_obj = ["tag", "type", "level"]
+    assert obj in allow_obj, "obj 参数值必须为 %s" % allow_obj
+
+    ls_obj_info = []
+    for ls_info in ls_done_info:
+        if obj == "tag":
+            obj_jy = ls_info[4]
+        elif obj == "type":
+            obj_jy = ls_info[2]
+        elif obj == "level":
+            obj_jy = ls_info[1]
+ 
+        for obj_ in ls_obj:
+            if obj_ in obj_jy:
+                ls_obj_info.append(ls_info)
+                break
+    return ls_obj_info
+
 if __name__ == "__main__":
-    # jy: 1) 创建项目目录结构 -----------------------------------
-    #generate_dir_file()
+    # jy: 1) 创建项目目录结构并往空文件中写入公共前缀部分 =============================
+    """
+    generate_dir_file()
+    # 往空文件中写入前缀部分
+    generate_dir_file(type_="write_prefix")
+    #add_prefix2file("./tmp-jy.py")
+    """
 
-    # jy: 2) 打印输出已完成的题目以及相关信息 -------------------
-    """
-    ls_all_info = generate_dir_file(is_statistic=True)
-    print("\n".join([str(ls_info) for ls_info in ls_all_info]))
-    """
 
-    # jy 3) 输出指定范围内的 UNDO 题目 --------------------------
+    # jy: 2) 打印输出已完成的题目以及相关信息、搜索指定类型/标签/难度等级的题目 =======
+    #"""
+    # 获取已完成的题目 ------------------------------------------
+    ls_all_info = generate_dir_file(type_="get_statistic")
+    #print("\n".join([str(ls_info) for ls_info in ls_all_info]))
+
+    # 从已完成的题目中搜索指定标签的题目 ------------------------
+    '''
+    #ls_obj = ["字典", "双指针"]
+    ls_obj = ["动态规划"]
+    ls_obj_info = get_tag_num(ls_all_info, ls_obj, obj="tag")
+    print("\n".join([str(ls_info) for ls_info in ls_obj_info]))
+    '''
+
+    # 从已完成的题目中搜索指定题目类型的题目 --------------------
+    '''
+    #ls_obj = ["字典", "双指针"]
+    ls_obj = ["string"]
+    ls_obj_info = get_tag_num(ls_all_info, ls_obj, obj="type")
+    print("\n".join([str(ls_info) for ls_info in ls_obj_info]))
+    '''
+
+    # 从已完成的题目中搜索指定难度等级的题目 --------------------
+    #'''
+    #ls_obj = ["字典", "双指针"]
+    ls_obj = ["M"]
+    ls_obj_info = get_tag_num(ls_all_info, ls_obj, obj="level")
+    print("\n".join([str(ls_info) for ls_info in ls_obj_info]))
+    #'''
+    #"""
+
+    # jy 3) 输出指定范围内的 UNDO 题目 ================================================
     """
-    ls_all_info = generate_dir_file(is_statistic=True)
+    ls_all_info = generate_dir_file(type_="get_statistic")
     #ls_undo_num = get_undo_num(ls_all_info)
-    ls_undo_num = get_undo_num(ls_all_info, start=1, end=20)
+    ls_undo_num = get_undo_num(ls_all_info, start=1, end=200)
     print(ls_undo_num)
     """
 
     # jy: 4) 基于题目号找题目路径
-    #"""
+    """
     num_ = 771
-    generate_dir_file(num_=num_)
-    #"""
+    generate_dir_file(type_=num_)
+    """
 
