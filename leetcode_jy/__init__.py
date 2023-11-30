@@ -28,6 +28,7 @@ linked_list
 number
 string
 tree
+class  (自定义类)
 """
 
 import os
