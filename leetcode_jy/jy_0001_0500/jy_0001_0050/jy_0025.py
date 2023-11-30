@@ -51,22 +51,26 @@ class Solution:
 自进行链表反转; 每组内的链表反转同 0092 (reverse-linked-list-II) 中的解法 3
     """
     def reverseKGroup(self, head: ListNode, k: int) -> ListNode:
-        # jy: 依据链表长度对链表进行按 k 分组;
+        # jy: 依据链表长度对链表进行按 k 分组
         groups = getLen(head) // k
+        # jy: 初始化一个哑节点, 并使该节点的下一节点为链表头节点, 最终返回
+        #     该哑节点的下一节点即可
         dummy = ListNode(-1)
         dummy.next = head
-        # jy: 最初上一组的末尾为 dummy, 当前组的末尾定为 head (经过调换后 head 即为末尾);
-        tail_of_prev_groups, tail_of_current_group = dummy, dummy.next
-        # jy: 循环遍历对每一组进行反转;
+        # jy: 初始化上一组的末尾和当前组的末尾节点; 最开始, 上一组的末尾为
+        #     dummy, 当前组的末尾定为 head (经过反转后 head 即为末尾)
+        tail_prev_groups, tail_current_group = dummy, dummy.next
+        # jy: 循环遍历每一组, 对每一组进行反转
         for _ in range(groups):
-            # jy: 调换 k 个元素; 将当前组的第 2 个元素开始不断往后移, 移动 k-1 次;
+            # jy: 反转 k 个元素; 将当前组的第 2 个元素开始不断往后移, 移动 k-1 次;
             for i in range(k-1):
-                next = tail_of_current_group.next
-                tail_of_current_group.next = next.next
-                next.next, tail_of_prev_groups.next = tail_of_prev_groups.next, next
-            # jy: 一组调换(视为上一组)完成后, 更新 tail_of_prev_groups, 并更新当前组(接下来要
+                # jy: 获取当前节点 (最开始为头节点) 的下一节点
+                cur_next = tail_current_group.next
+                tail_current_group.next = cur_next.next
+                cur_next.next, tail_prev_groups.next = tail_prev_groups.next, cur_next
+            # jy: 一组调换(视为上一组)完成后, 更新 tail_prev_groups, 并更新当前组(接下来要
             #    调换的)的末尾为上一组末尾的下一个(调换后即为当前组末尾);
-            tail_of_prev_groups, tail_of_current_group = tail_of_current_group, tail_of_current_group.next
+            tail_prev_groups, tail_current_group = tail_current_group, tail_current_group.next
         return dummy.next
 
 
