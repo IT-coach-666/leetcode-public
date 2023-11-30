@@ -23,10 +23,11 @@ from leetcode_jy import *
 题目类型: 
 array_dim_1
 array_dim_2
+graph
 linked_list
-string
 number
-
+string
+tree
 """
 
 import os
