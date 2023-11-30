@@ -10,11 +10,11 @@ assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
        url_ == "www.yuque.com/it-coach"
 from typing import List, Dict
 # jy: 记录该题的难度系数
-type_jy = ""
+type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "swap-nodes-in-pairs(linked_list)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "链表节点的移动与反转 | 递归（注意细节）"
 
 
 
@@ -33,63 +33,67 @@ from leetcode_jy.utils_jy.about_ListNode import getLen, getTailNode, showLnValue
 
 class Solution:
     """
-解法1: 由于链表反转会改变原有链表的头结点, 我们使用一个 dummy 节点来指向原链表的头结
-点(即 dummy.next = head), 最后返回 dummy.next 即为新链表的头结点; 首先定义两个变量, 
-prev 指向 dummy(即当前节点的前一节点), current 指向 dummy.next(即当前节点),当 current 
-和 current.next 都不为空时, 反转 current 和 current.next:
+解法 1: 链表反转会改变原有链表的头结点, 因此使用 dummy 节点(哑节点)且令
+`dummy.next = head`, 最后返回 dummy.next 即为新链表的头结点
 
-1)将 current 的 next 指针指向 current.next 的 next 指针
-current.next = current.next.next
+定义两个变量 prev 和 current (当前节点), prev 指向 dummy (当前节点的前一
+节点), current 指向 dummy.next (当前节点), 当 current 和 current.next 都
+不为空时, 反转 current 和 current.next:
+1) 将 current 的 next 指针指向 current.next 的 next 指针
+   current.next = current.next.next
+2) 将原 current 的下一个结点的 next 指针指向 current
+   current.next.next = current
+3) 将 prev.next 指向【原 current】的下一个结点 (保证链表片段间能连接起来):
+   prev.next = current.next
 
-2)将原 current 的下一个结点的 next 指针指向 current:
-current.next.next = current
-
-3)将 prev.next 指向【原 current】的下一个结点(此处的作用是保证链表片段间能连接起来):
-prev.next = current.next
-
-然后, 将 prev 新赋值为 current, 将 current 新赋值为 current.next
-并将【现 current】指向【原 current】的下下个节点(next.next)
+然后, 将 prev 赋值为 current, 将 current 赋值为 current.next, 进行下一轮循环
     """
     def swapPairs_v1(self, head: ListNode) -> ListNode:
         dummy = ListNode(-1)
         dummy.next = head
-        # jy: 定义两个变量, prev 指向 dummy(即 head 的前一节点), current 指向 dummy.next(即 head);
+        # jy: 定义两个变量, prev 指向 dummy (即当前头节点 head 的前一节点),
+        #     current 指向 dummy.next (即当前头节点 head)
         prev, current = dummy, dummy.next
-        # jy: 如果当前节点及其下一节点均存在(以 1->2->3->4 为例进行思考);
+        # jy: 如果当前节点及其下一节点均存在 (以 1->2->3->4 为例进行思考)
         while current and current.next:
-            #part-v1: 必须引入中间变量(如果是数值, 可通过算术运算特性避免中间变量)
+            # jy: 必须引入中间变量 (如果是数值, 可通过算术运算特性避免中间变量)
+            # jy: version-1
             """
             next = current.next
             current.next, next.next, prev.next = next.next, current, next
             """
-            #part-v2: 必须引入中间变量(如果是数值, 可通过算术运算特性避免中间变量)
+            # jy: version2
             c_next = current.next
             current.next = c_next.next
             c_next.next = current
-            prev.next = c_next         # jy: 此处的作用是保证链表片段间能连接起来;
+            # jy: 此处的作用是保证链表片段间能连接起来
+            prev.next = c_next       
 
             #print(c_next.val)
-            # jy: 更新 prev 为原先的 current, 因为原先的 current 与其下一个调换后, 就成
-            #    为下下个的 prev; 更新 current 为原先 current 的下下个, 即 current.next; 经
-            #    过更新后的 current.next 即已经指向了【原 current】的下下个节点(next.next)
+            # jy: 以第一轮循环为例, 经过反转后, current 变为第二个节点, 且指
+            #     向第三个节点, 此时 prev 设置为 current (即第二个节点), 而 
+            #     current 设置为 current.next (即第三个节点), 即可开始下一轮
+            #     的节点反转
             prev, current = current, current.next
         return dummy.next
 
 
     """
-解法2: 同样还可以用递归求解
+解法 2: 递归
+
+以 1->2->3->4 为例进行思考
     """
     def swapPairs_v2(self, head: ListNode) -> ListNode:
-        # jy: 以 1->2->3->4 为例进行思考
+        # jy: 如果为空链表或仅含一个节点, 则直接返回
         if not head or not head.next:
             return head
-        # jy: 获取原头节点的下一个节点;
+        # jy: 当前节点为头节点, 获取头节点的下一节点
         h_next = head.next
-        # jy: 调换后, 头节点的下一个节点为原头节点的下下个节点开始进行调换的结果;
+        # jy: 调换后, 头节点的下一节点为头节点的下下个节点, 而头节点的下一节
+        #     点的下一个节点为头节点
         head.next = self.swapPairs_v2(h_next.next)
-        # jy: 调换后, 原头节点的下一个节点的下一个节点为原头节点;
         h_next.next = head
-        # jy: 调换后的头节点为原头节点的下一个节点;
+        # jy: 调换后的头节点为原头节点的下一个节点, 直接返回即可
         return h_next
 
 

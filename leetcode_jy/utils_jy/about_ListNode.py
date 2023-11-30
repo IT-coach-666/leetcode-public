@@ -1,4 +1,7 @@
 class ListNode:
+    """
+    链表节点类
+    """
     def __init__(self, x, next = None):
         self.val = x
         self.next = next
@@ -9,7 +12,7 @@ class ListNode:
 
 def getListNodeFromList(ls_, pos=-1):
     """
-    将 list 转换为 ListNode 形式
+    基于列表构造链表, 并返回链表的头节点
     
     pos 不为 -1 时表示有环 (最后一个值的 next 为 pos 位置的对应
     的 ListNode)
