@@ -10,8 +10,113 @@ assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
        url_ == "www.yuque.com/it-coach"
 from typing import List, Dict
 # jy: 记录该题的难度系数
-type_jy = ""
+type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
-title_jy = "(array_dim_1)"
+title_jy = "Combination-Sum-II(array_dim_1)"
 # jy: 记录不同解法思路的关键词
 tag_jy = ""
+
+
+"""
+Given a collection of candidate numbers (candidates) and a target number (target),
+find all unique combinations in candidates where the candidate numbers sum to target.
+Each number in candidates may only be used once in the combination.
+
+Note: The solution set must not contain duplicate combinations.
+
+
+
+Example 1:
+Input: candidates = [10,1,2,7,6,1,5], target = 8
+Output:
+[[1,1,6],
+ [1,2,5],
+ [1,7],
+ [2,6]]
+
+Example 2:
+Input: candidates = [2,5,2,1,2], target = 5
+Output:
+[[1,2,2],
+[5]]
+
+
+
+Constraints:
+1 <= candidates.length <= 100
+1 <= candidates[i] <= 50
+1 <= target <= 30
+"""
+
+
+from typing import List
+
+
+class Solution:
+    """
+在 039_Combination-Sum.py 的基础上增加去重, 因为本题中 candidates 中的数字有可能重复,
+即 candidates 中当前数字等于前一个数字, 则跳过;
+    """
+    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
+        result = []
+        # jy: 传入已排序的列表, 列表起始下标(在列表中的该下标位置之后的元素中找), 要查
+        #    找的目标值, 当前的组合记录, 结果列表;
+        self._dfs(sorted(candidates), 0, target, [], result)
+        return result
+
+
+    def _dfs(self, candidates, start, target, combination, result):
+        """
+        传入的参数为已排序的列表, 列表起始下标(在列表中的该下标位置之后的元素中找), 要查
+        找的目标值, 当前的组合记录, 结果列表;
+        """
+        # jy: 如果剩余要查找的 target 为 0, 表明当前的 combination 已经满足要求, 将其加入
+        #    到结果列表
+        if target == 0:
+            result.append(combination)
+            return
+        # jy: 从候选数组中的下标为 start 的位置开始找组合中的元素;
+        for i in range(start, len(candidates)):
+            n = candidates[i]
+            # jy: 如果该元素大于目标值 target, 则直接跳出循环, 终止;
+            if n > target:
+                break
+            # jy: 如果 i > start (确保 i-1 有效, 即有前一个值), 且当前值与前一个值相等, 则跳过
+            #    当前数值, 防止后续递归中出现相同组合 (深度思考: 因为假如有两个连续位置数值相
+            #    同的, 且最终两个相同的数值可以结合其它数值构成一个满足条件的组合, 则当遍历第
+            #    一个位置的数值时, 加入候选列表后进行下一轮递归, 则下一轮递归时肯定会把第二个
+            #    数值考虑到, 使得两个数都被放入组合, 此时当前此轮的 for 循环的下一轮循环时, 就
+            #    不应该再把相同的第二个数值放入并递归查找了, 否则就会有相同组合结果, 导致重复)
+            if i > start and candidates[i] == candidates[i-1]:
+                continue
+            # jy: 遍历完当前数值后, 下一个目标值为原目标值减去当前数值, 且从下一个数值位置开始遍
+            #    历查找(如果下一个数值对应的下标不存在, 则会跳出循环)
+            self._dfs(candidates, i+1, target - n, combination[:] + [n], result)
+            #self._dfs(candidates, i+1, target - n, combination + [n], result)
+
+
+
+candidates = [10, 1, 2, 7, 6, 1, 5]
+target = 8
+'''
+Output:
+[[1,1,6],
+ [1,2,5],
+ [1,7],
+ [2,6]]
+'''
+res = Solution().combinationSum2(candidates, target)
+print(res)
+
+
+candidates = [2, 5, 2, 1, 2]
+target = 5
+'''
+Output:
+[[1,2,2],
+[5]]
+'''
+res = Solution().combinationSum2(candidates, target)
+print(res)
+
+
