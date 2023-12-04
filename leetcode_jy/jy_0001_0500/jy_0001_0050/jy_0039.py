@@ -10,8 +10,134 @@ assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
        url_ == "www.yuque.com/it-coach"
 from typing import List, Dict
 # jy: 记录该题的难度系数
-type_jy = ""
+type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
-title_jy = "(array_dim_1)"
+title_jy = "Combination-Sum(array_dim_1)"
 # jy: 记录不同解法思路的关键词
 tag_jy = ""
+
+
+"""
+Given an array of distinct integers candidates and a target integer target, return a list of
+all unique combinations of candidates where the chosen numbers sum to target. You may return
+the combinations in any order.
+
+The same number may be chosen from candidates an unlimited number of times. Two combinations are
+unique if the frequency of at least one of the chosen numbers is different.
+
+It is guaranteed that the number of unique combinations that sum up to target is less than 150
+combinations for the given input.
+
+Example 1:
+Input: candidates = [2, 3, 6, 7], target = 7
+Output: [[2, 2, 3], [7]]
+Explanation: 2 and 3 are candidates, and 2 + 2 + 3 = 7. Note that 2 can be used multiple times.
+             7 is a candidate, and 7 = 7. These are the only two combinations.
+
+Example 2:
+Input: candidates = [2, 3, 5], target = 8
+Output: [[2, 2, 2, 2], [2, 3, 3], [3, 5]]
+
+Example 3:
+Input: candidates = [2], target = 1
+Output: []
+
+Example 4:
+Input: candidates = [1], target = 1
+Output: [[1]]
+
+Example 5:
+Input: candidates = [1], target = 2
+Output: [[1, 1]]
+
+Constraints:
+1 <= candidates.length <= 30
+1 <= candidates[i] <= 200
+All elements of candidates are distinct.
+1 <= target <= 500
+"""
+
+
+from typing import List
+class Solution:
+    """
+解法1: 该题等价于先从 candidates 中挑选一个数 k, 然后继续在 candidates 中挑选几个数, 其和
+为 target - k, 使用递归求解; 递归时, 记录下当前数字在 candidates 中的序号, 从当前序号开始
+遍历 candidates 即可, 避免结果重复;
+    """
+    def combinationSum_v1(self, candidates: List[int], target: int) -> List[List[int]]:
+        result = []
+        self._dfs(candidates, 0, target, [], result)
+        return result
+
+    def _dfs(self, candidates, start, target, combination, result):
+        # jy: 由于 candidates 为 1~200 的数值, 故 target 不能为负值; target 为负时, 表明
+        #    找不到目标组合;
+        if target < 0:
+            return
+        # jy: target 为 0 表明已经找到
+        elif target == 0:
+            result.append(combination)
+            return
+
+        # jy: 遍历候选值, 由于可重复使用同一个值, 确定一个值后, 剩余的值也从 位置 i 找起;
+        for i in range(start, len(candidates)):
+            n = candidates[i]
+            self._dfs(candidates, i, target - n, combination[:] + [n], result)
+
+    """
+解法2: 在解法 1 的基础上进行一个优化, 实现将 candidates 排序, 递归搜索时, 如果当前数字大
+于 target, 则终止搜索;
+    """
+    def combinationSum_v2(self, candidates: List[int], target: int) -> List[List[int]]:
+        result = []
+        self._dfs(sorted(candidates), 0, target, [], result)
+        return result
+
+    def _dfs(self, candidates, start, target, combination, result):
+        if target == 0:
+            result.append(combination)
+            return
+
+        for i in range(start, len(candidates)):
+            n = candidates[i]
+            if n > target:
+                break
+            self._dfs(candidates, i, target - n, combination[:] + [n], result)
+
+
+candidates = [2, 3, 6, 7]
+target = 7
+# Output: [[2, 2, 3], [7]]
+res = Solution().combinationSum_v1(candidates, target)
+print(res)
+
+
+candidates = [2, 3, 5]
+target = 8
+# Output: [[2, 2, 2, 2], [2, 3, 3], [3, 5]]
+res = Solution().combinationSum_v1(candidates, target)
+print(res)
+
+
+candidates = [2]
+target = 1
+# Output: []
+res = Solution().combinationSum_v1(candidates, target)
+print(res)
+
+
+candidates = [1]
+target = 1
+# Output: [[1]]
+res = Solution().combinationSum_v1(candidates, target)
+print(res)
+
+
+candidates = [1]
+target = 2
+# Output: [[1, 1]]
+res = Solution().combinationSum_v1(candidates, target)
+print(res)
+
+
