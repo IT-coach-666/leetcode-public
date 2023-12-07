@@ -127,21 +127,56 @@ len(words[0]) 的字符串, 判断所有的字符串出现的次数是否等于 
 
 
     """
-解法 4: 单词化的滑动窗口; 性能极大提升, 但内存占用较多
+解法 4: 单词化的滑动窗口 
+    """
+    def findSubstring_v4(self, s: str, words: List[str]) -> List[int]:
+        counter = collections.Counter(words)
+        # jy: 字符串 s 的长度
+        len_s = len(s) 
+        # jy: 总单词数量
+        num_word = len(words)
+        # jy: 单个单词长度
+        len_word = len(words[0]) 
+        ls_res = []
+        for i in range(len_word):
+            s_i = s[i:]
+            words_s_i = len(s_i) // len_word
+            if words_s_i < num_word:
+                break
+            ls_s_i_word = [s_i[j * len_word: (j+1) * len_word] for j in range(words_s_i)]
+            # jy: 仅用于调试时输出查看
+            #print(ls_s_i_word, " === ", words)
+            for j in range(words_s_i):
+                if j + num_word > words_s_i:
+                    break
+                candidate_words = ls_s_i_word[j: j + num_word]
+                # jy: 仅用于调试时输出查看
+                #print("i=%s, j=%s, candidate_words = %s" % (i, j, candidate_words))
+                if collections.Counter(candidate_words) == counter:
+                    ls_res.append(i + j * len_word)
+        return ls_res
+
+
+    """
+解法 5: 单词化的滑动窗口; 性能极大提升, 但内存占用较多
     """
     def findSubstring(self, s: str, words: List[str]) -> List[int]:
-        ls = len(s)         # 字符串s的长度
-        m = len(words)      # 总单词数量
-        n = len(words[0])   # 单个单词长度
-        res = []
-        if ls < m * n:
-            return res      # 字符串s的长度小于所有单词拼接起来的长度，直接返回
+        # jy: 字符串 s 的长度
+        len_s = len(s)
+        # jy: 单词的数量 
+        m = len(words)  
+        # jy: 单词的长度
+        n = len(words[0]) 
+        ls_res = []
+        # jy: 
+        if len_s < m * n:
+            return ls_res      # 字符串s的长度小于所有单词拼接起来的长度，直接返回
         # 枚举每一个切分单词的起点，共有[0, n-1]个起点
         for i in range(n):
             diff = {}   # 记录滑动窗口中每个单词和words中对应单词的个数差值，diff为空，说明滑动窗口中的单词与word一致
             # 从起点i开始，将前m个子串单词加入哈希表，前m个单词就是首个滑动窗口里的单词; j表示第几个单词
             for j in range(m):
-                if i + (j + 1) * n > ls:    # 当前提取的子串单词右边界越界
+                if i + (j + 1) * n > len_s:    # 当前提取的子串单词右边界越界
                     break
                 w = s[i + j * n : i + (j + 1) * n]
                 diff[w] = diff.get(w, 0) + 1
@@ -151,7 +186,7 @@ len(words[0]) 的字符串, 判断所有的字符串出现的次数是否等于 
                 if diff[word] == 0:
                     diff.pop(word)  # 单词数目为0，说明这个单词在滑动窗口和words的数目匹配，直接移除；
             # 移动这个长度固定为m*n的滑动窗口，左边界left为每个单词的起点，滑动窗口范围[left, left + m * n)
-            for left in range(i, ls - m * n + 1, n):
+            for left in range(i, len_s - m * n + 1, n):
                 # 从第二个单词开始，开始要加入新单词，移除旧单词
                 if left > i:
                     w = s[left + (m - 1) * n : left + m * n]    # 从右边界right = left + (m - 1) * n，为要加入滑动窗口的单词的起点
@@ -164,8 +199,8 @@ len(words[0]) 的字符串, 判断所有的字符串出现的次数是否等于 
                         diff.pop(w)
                 # diff为空，说明滑动窗口中的单词与word一致；left即为子串起点
                 if not diff:
-                    res.append(left)
-        return res
+                    ls_res.append(left)
+        return ls_res
 
 
 s = "barfoothefoobarman"
@@ -193,6 +228,13 @@ s = "barfoothefoobarman"
 words = ["foo","bar"]
 # Output: [0, 9]
 res = Solution().findSubstring_v2(s, words)
+print(res)
+
+
+s = "wordgoodgoodgoodbestword"
+words = ["word","good","best","good"]
+# Output: [8]
+res = Solution().findSubstring_v4(s, words)
 print(res)
 
 
