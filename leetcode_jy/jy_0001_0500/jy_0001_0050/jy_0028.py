@@ -71,7 +71,7 @@ class Solution:
 
         def calShiftMat(st):
             """
-            偏移表计算函数
+            偏移表计算函数 【IMP】
             """
             dict_ = {}
             for i in range(len(st)-1, -1, -1):
@@ -122,6 +122,11 @@ class Solution:
     """
     def strStr_v4(self, haystack: str, needle: str) -> int:
         def get_next(needle):
+            """
+            基于子串 needle 生成 next 数组【IMP】
+
+            next[i] 表示子串区间 [0, i] 中最长相等的前缀和后缀
+            """
             len_ = len(needle)
             # jy: 初始化 next 数组
             next_ = [0] * len_
@@ -145,7 +150,7 @@ class Solution:
 
 
         len_n = len(needle)
-        # jy: 生成 needle 的 next 数组
+        # jy: 生成 needle 的 next 数组【IMP】
         next_ = get_next(needle) 
 
         # jy: 遍历 haystack 的指针
@@ -165,8 +170,8 @@ class Solution:
             else:
                 j = next_[j - 1]
 
-            # jy: needle 匹配完成, 返回匹配起点等于 i - n (最后一位匹配完
-            #     成后 i 也会后移一位, 即匹配区间为 [i-n, i-1] 长度为 n)
+            # jy: needle 匹配完成, 返回匹配起点(为 i - len_n, 最后一位匹配完
+            #     成后 i 也会后移一位, 匹配区间为 [i-len_n, i-1] 长度为 len_n)
             if j >= len_n:
                 return i - len_n
         # jy: 没有找到匹配子串, 返回 -1
