@@ -14,12 +14,13 @@ type_jy = "S"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Search-Insert-Position(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "二分查找 (bisect 模块)"
 
 
 """
-Given a sorted array of distinct integers and a target value, return the index if the
-target is found. If not, return the index where it would be if it were inserted in order.
+Given a sorted array of distinct integers and a target value, return the index
+if the target is found. If not, return the index where it would be if it were
+inserted in order.
 
 You must write an algorithm with O(log n) runtime complexity.
 
@@ -52,38 +53,48 @@ nums contains distinct values sorted in ascending order.
 -10^4 <= target <= 10^4
 """
 
-from typing import List
-import bisect
-
 
 class Solution:
     """
-二分查找, 等价于:
-1) 求解比 target 小的数里最大的数所在位置加 1
-2) 求数组中大于或等于 target 的最小数值, 如果该值不存在, 则返回数组长度作为 target 的下标
-以上两个角度思考是等价的, 二分查找的代码完全一致;
+解法 1: 二分查找
 
-JY: 不可与以下问题等价:
-求比 target 大的最小数所在的位置 (因为 target 可能存在于数组中, 此时要返回其下标, 而不能求比它大的数值)
+该题有以下两种理解方式: 
+1) 求比 target 小的数里最大的数的下一个位置下标
+2) 求数组中大于或等于 target 的最小数值, 如果该值不存在, 则返回数组长
+   度作为目标下标位置 (当 target 在数组中时, 返回该值的下标位置)
     """
     def searchInsert_v1(self, nums: List[int], target: int) -> int:
-        low, high = 0, len(nums)
-        # jy: 当 low == high 时会退出循环, 此时的 nums[high || low] >= target (如
-        #    果 nums[low] 存在的话, 如果不存在, 则表明 target 比数组中的最后一个
-        #    值大, 此时返回的 low 为数组最后一个值的下标加 1)
-        while low < high:
-            middle = low + (high - low) // 2
+        low, high = 0, len(nums) - 1
+        # jy: 假设列表最后一个值为 target, 则循环过程中的 mid 总是满足
+        #     nums[mid] < target, 因此不断更新 low 值, 当且仅当最后一次
+        #     循环 low == high 时, nums[mid] == target, 此时再次更新 high
+        #     会使得 low > high, 因此退出循环返回的 low 值符合要求; 如果
+        #     列表中所有值都比 target 小, 则循环过程会不断更新 low 值, 直
+        #     到更新的 low 值大于 high 时退出循环并返回, 即最终 low 值为
+        #     初始 high 的下一个位置下标
+        while low <= high:
+            mid = low + (high - low) // 2
 
-            if nums[middle] < target:
-                low = middle + 1
-            # jy: 以下注释的 elif 部分是对问题的细微优化;
-            # elif nums[middle] == target:
-            #     return middle
+            if nums[mid] < target:
+                low = mid + 1
+            # jy: 以下 elif 逻辑可优化提速 (去除也正确); 如果去除该部分, 则
+            #     当找到符合要求的 mid 时, 仍去更新 high 值为 mid - 1, 使得
+            #     后续循环中得到的中间值 mid_v2 不再满足要求, 因此 low 会不
+            #     断更新为 mid_v2 + 1, 直到更新为比原先的 high 值大为止才退
+            #     出循环, 而原先的 high 值为 mid-1, 比其大即为 mid, 因此最终
+            #     返回的下标位置 low (即原先满足要求的 mid) 对应的值为 target
+            elif nums[mid] == target:
+                return mid
             else:
-                high = middle
+                high = mid - 1
         return low
 
-    def searchInsert_jy(self, nums: List[int], target: int) -> int:
+
+    """
+解法 2: 同解法 1, 但使用 bisect 模块
+    """
+    def searchInsert_v2(self, nums: List[int], target: int) -> int:
+        import bisect
         return bisect.bisect_left(nums, target)
 
 
@@ -108,13 +119,13 @@ print(res)
 nums = [1, 3, 5, 6]
 target = 0
 # Output: 0
-res = Solution().searchInsert_jy(nums, target)
+res = Solution().searchInsert_v2(nums, target)
 print(res)
 
 nums = [1]
 target = 0
 # Output: 0
-res = Solution().searchInsert_jy(nums, target)
+res = Solution().searchInsert_v2(nums, target)
 print(res)
 
 
