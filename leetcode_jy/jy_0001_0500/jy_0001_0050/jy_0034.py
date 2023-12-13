@@ -47,7 +47,6 @@ nums is a non-decreasing array.
 """
 
 
-from typing import List
 import bisect
 
 

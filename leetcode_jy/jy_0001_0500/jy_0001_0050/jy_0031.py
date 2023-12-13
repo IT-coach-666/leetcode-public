@@ -14,15 +14,14 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Next-Permutation(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "运算技巧 | 参考 0556"
 
 
 """
 A permutation(排列, 组合) of an array of integers is an arrangement of its
-members into a sequence or linear order.
-
-For example, for arr = [1,2,3], the following are all the permutations of 
-arr: [1,2,3], [1,3,2], [2, 1, 3], [2, 3, 1], [3,1,2], [3,2,1].
+members into a sequence or linear order. For example, for arr = [1,2,3], the
+following are all the permutations of arr: 
+[1,2,3], [1,3,2], [2, 1, 3], [2, 3, 1], [3,1,2], [3,2,1].
 
 The next permutation of an array of integers is the next lexicographically
 greater permutation of its integer. More formally, if all the permutations
@@ -34,7 +33,6 @@ order).
 
 
 For example, the next permutation of arr = [1,2,3] is [1,3,2].
-
 Similarly, the next permutation of arr = [2,3,1] is [3,1,2].
 
 While the next permutation of arr = [3,2,1] is [1,2,3] because [3,2,1] does
@@ -74,19 +72,20 @@ Constraints:
 
 class Solution:
     """
-解法 1: 同 0556 (Next-Greater-Element-III), 额外增加当不存在下一个较大值时将
-数组反转; 函数不返回任何值, 因为是 in-place 置换
+解法 1: 参考 0556 (Next-Greater-Element-III), 当不存在下一个较大值时将数组反转
+
+函数不返回任何值, 因为是 in-place 置换
     """
     def nextPermutation_v1(self, nums: List[int]) -> None:
-        # jy: 如果数组是降序排序, 反转其为升序;
+        # jy: 如果数组是降序排序, 反转其为升序并返回
         i = len(nums) - 1
         while i-1 >= 0 and nums[i] <= nums[i-1]:
             i -= 1
         if i == 0:
-            # jy: 在 556_Next-Greater-Element-III.py 的基础上补充对数组进行倒序排列;
+            # jy: 在 0556 的基础上补充对数组进行倒序排列 (可自行实现反转效果)
             nums.reverse()
             return
-        # jy: 截止当前 i 位置, 其右侧的数据均是降序排序的
+
         j = i
         while j+1 < len(nums) and nums[j+1] > nums[i-1]:
             j += 1
