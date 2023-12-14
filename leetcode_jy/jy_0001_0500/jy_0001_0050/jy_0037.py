@@ -14,7 +14,7 @@ type_jy = "H"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Sudoku-solver(array_dim_2)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "递归回溯 + 九宫格获取技巧"
 
 
 """
@@ -209,6 +209,40 @@ class Solution:
         return False
 
 
+    """
+解法 3: 类似解法 2, 但更省内存 (也更多的数学运算)
+    """
+    def solveSudoku_v3(self, board) -> None:
+        ls_empty = [(row, column) for row in range(9) for column in range(9) if board[row][column] == '.']
+        empty_num = len(ls_empty)
+        set_num = set("123456789")
+ 
+        def dfs(k):            
+            if k == empty_num: 
+                return True
+
+            row, column = ls_empty[k]
+            # jy: 9 * 9 的矩阵可分为 3 * 3 个九宫格, 此处为九宫格矩阵进行索引
+            i, j = row // 3 * 3, column // 3 * 3
+            # jy: 当前位置可填充的数值不能包含当前行、列、九宫格已有的数值
+            candidate_num = set_num - set(board[row]) \
+                            - set(list(zip(*board))[column]) \
+                            - set(board[i  ][j: j+3] + 
+                                  board[i+1][j: j+3] + 
+                                  board[i+2][j: j+3])
+            # jy: 逐个尝试将 candidate_num 中的数值往 board[row][column] 填充,
+            #     如果填充后进入下一个递归继续填充能满足要求, 则返回
+            #for num in candidate_num:
+            #    board[row][column] = num
+            for board[row][column] in candidate_num:
+                if dfs(k + 1):
+                    return True
+            board[row][column] = '.'
+            return False  
+
+        dfs(0)
+
+
 board = \
 [['5', '3', '.', '.', '7', '.', '.', '.', '.'],
  ['6', '.', '.', '1', '9', '5', '.', '.', '.'],
@@ -235,6 +269,20 @@ board = \
  ['.', '.', '.', '4', '1', '9', '.', '.', '5'],
  ['.', '.', '.', '.', '8', '.', '.', '7', '9']]
 Solution().solveSudoku_v2(board)
+pprint.pprint(board)
+
+
+board = \
+[['5', '3', '.', '.', '7', '.', '.', '.', '.'],
+ ['6', '.', '.', '1', '9', '5', '.', '.', '.'],
+ ['.', '9', '8', '.', '.', '.', '.', '6', '.'],
+ ['8', '.', '.', '.', '6', '.', '.', '.', '3'],
+ ['4', '.', '.', '8', '.', '3', '.', '.', '1'],
+ ['7', '.', '.', '.', '2', '.', '.', '.', '6'],
+ ['.', '6', '.', '.', '.', '.', '2', '8', '.'],
+ ['.', '.', '.', '4', '1', '9', '.', '.', '5'],
+ ['.', '.', '.', '.', '8', '.', '.', '7', '9']]
+Solution().solveSudoku_v3(board)
 pprint.pprint(board)
 
 
