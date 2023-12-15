@@ -14,32 +14,32 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Combination-Sum-II(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "UNDO 组合问题 (元素有重复、不可复选) | 递归 | 相似题: 参考 permutation_combination_subset"
 
 
 """
-Given a collection of candidate numbers (candidates) and a target number (target),
-find all unique combinations in candidates where the candidate numbers sum to target.
-Each number in candidates may only be used once in the combination.
+Given a collection of candidate numbers `candidates` and a target number
+`target`, find all unique combinations in `candidates` where the candidate
+numbers sum to `target`.
+
+Each number in `candidates` may only be used once in the combination.
 
 Note: The solution set must not contain duplicate combinations.
 
 
-
 Example 1:
-Input: candidates = [10,1,2,7,6,1,5], target = 8
+Input: candidates = [10, 1, 2, 7, 6, 1, 5], target = 8
 Output:
-[[1,1,6],
- [1,2,5],
- [1,7],
- [2,6]]
+[[1, 1, 6],
+ [1, 2, 5],
+ [1, 7],
+ [2, 6]]
 
 Example 2:
-Input: candidates = [2,5,2,1,2], target = 5
+Input: candidates = [2, 5, 2, 1, 2], target = 5
 Output:
-[[1,2,2],
-[5]]
-
+[[1, 2, 2],
+ [5]]
 
 
 Constraints:
@@ -49,15 +49,14 @@ Constraints:
 """
 
 
-from typing import List
-
-
 class Solution:
     """
-在 039_Combination-Sum.py 的基础上增加去重, 因为本题中 candidates 中的数字有可能重复,
-即 candidates 中当前数字等于前一个数字, 则跳过;
+解法 1:  0039 (Combination-Sum) 中输入元素没有重复, 本题中 candidates 中的
+数字有可能重复
+
+candidates 中当前数字等于前一个数字, 则跳过
     """
-    def combinationSum2(self, candidates: List[int], target: int) -> List[List[int]]:
+    def combinationSum2_v1(self, candidates: List[int], target: int) -> List[List[int]]:
         result = []
         # jy: 传入已排序的列表, 列表起始下标(在列表中的该下标位置之后的元素中找), 要查
         #    找的目标值, 当前的组合记录, 结果列表;
@@ -95,28 +94,44 @@ class Solution:
             #self._dfs(candidates, i+1, target - n, combination + [n], result)
 
 
+    def combinationSum2_v2(self, candidates: List[int], target: int) -> List[List[int]]:
+        if not candidates:
+            return []
+        # jy: 优先对数组进行排序
+        candidates.sort()
+        n = len(candidates)
+        res = []
+        
+        def backtrack(i, tmp_sum, tmp_list):
+            if tmp_sum == target:
+                res.append(tmp_list)
+                return 
+            for j in range(i, n):
+                if tmp_sum + candidates[j]  > target : break
+                if j > i and candidates[j] == candidates[j-1]:continue
+                backtrack(j + 1, tmp_sum + candidates[j], tmp_list + [candidates[j]])
+        backtrack(0, 0, [])    
+        return res
+
+
 
 candidates = [10, 1, 2, 7, 6, 1, 5]
 target = 8
-'''
-Output:
-[[1,1,6],
- [1,2,5],
- [1,7],
- [2,6]]
-'''
 res = Solution().combinationSum2(candidates, target)
 print(res)
-
+"""
+[[1, 1, 6],
+ [1, 2, 5],
+ [1, 7],
+ [2, 6]]
+"""
 
 candidates = [2, 5, 2, 1, 2]
 target = 5
-'''
-Output:
-[[1,2,2],
-[5]]
-'''
 res = Solution().combinationSum2(candidates, target)
 print(res)
-
+"""
+[[1, 2, 2],
+ [5]]
+"""
 

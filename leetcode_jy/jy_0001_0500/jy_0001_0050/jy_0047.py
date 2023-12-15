@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Permutations-II(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "UNDO 排列问题 (元素可重复、不可复选) | 相似题: 参考 permutation_combination_subset"
 
 
 """
@@ -60,6 +60,41 @@ class Solution:
             if i > 0 and nums[i] == nums[i-1]:
                 continue
             self._permute(count - 1, nums[0:i] + nums[i+1:], permutation + [n], permutations)
+
+
+    def permuteUnique(self, nums):
+        """
+        :type nums: List[int]
+        :rtype: List[List[int]]
+        """
+                if not nums:
+            return []
+        nums.sort()
+        n = len(nums)
+        visited = [0] * n
+        res = []
+
+        def helper1(temp_list, length):
+            # if length == n and temp_list not in res:
+            # 	res.append(temp_list)
+            if length == n:
+                res.append(temp_list)
+            for i in range(n):
+                if visited[i] or (i > 0 and nums[i] == nums[i - 1] and not visited[i - 1]):
+                    continue
+                visited[i] = 1
+                helper1(temp_list + [nums[i]], length + 1)
+                visited[i] = 0
+
+        def helper2(nums, temp_list, length):
+            if length == n and temp_list not in res:
+                res.append(temp_list)
+            for i in range(len(nums)):
+                helper2(nums[:i] + nums[i + 1:], temp_list + [nums[i]], length + 1)
+
+        helper1([],0)
+        # helper2(nums, [], 0)
+        return res
 
 
 nums = [1, 1, 2]

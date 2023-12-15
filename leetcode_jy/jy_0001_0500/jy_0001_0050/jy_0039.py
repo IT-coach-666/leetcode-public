@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Combination-Sum(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "组合问题(元素无重复、可复选) | 递归 | 相似题: 参考 permutation_combination_subset"
 
 
 """
@@ -71,7 +71,11 @@ class Solution:
 中挑选几个数, 其和为 target - k
 
 递归时, 记录当前数值在 candidates 中的序号, 从当前序号开始遍历
-candidates 即可避免结果重复
+candidates 即可避免结果重复;
+
+如果每层递归都对全体 candidates 做遍历会导致如 [2, 2, 3], [3, 2, 2] 这
+样的对称重复的答案的产生; 每次更深层的递归都应往后缩小一个 candidates,
+即可避免结果重复
     """
     def combinationSum_v1(self, candidates: List[int], target: int) -> List[List[int]]:
         ls_res = []
@@ -107,16 +111,55 @@ candidates 即可避免结果重复
 
 
     """
-解法 2: 在解法 1 的基础上进行优化: 先将 candidates 排序, 递归搜索时如果当前
-数字大于 target, 则可终止搜索
+解法 2: 解法 1 的另一种写法
+
+递归回溯算法不管怎么优化时间复杂度都不可能低于 O(N!), 因为穷举整棵决策树是无
+法避免的; 不像动态规划能重叠子问题, 回溯算法就是纯暴力穷举, 复杂度一般都很高
+
+该题是组合问题, 也是子集问题: candidates 的哪些子集的和为 target ? 想解决这类
+问题也得回到回溯树上; 标准的子集/组合问题如何保证不重复使用元素？答案在于递归
+时输入的参数 start
+
+start 从 i 开始, 则下一层回溯树就从 i + 1 开始, 从而保证 nums[i] 这个元素不会
+被重复使用; 反过来, 如果我想让每个元素被重复使用, 只要把 i + 1 改成 i 即可
+
+这样这棵回溯树会永远生长下去, 所以递归函数需要结束条件, 即路径和大于 target 时
+就没必要再遍历下去了
     """
     def combinationSum_v2(self, candidates: List[int], target: int) -> List[List[int]]:
+        ls_res = []
+        self._dfs_v2(candidates, [], target, 0, ls_res)
+        return ls_res
+
+    def _dfs_v2(self, candidates, path, target, start, ls_res):
+        if sum(path) == target:
+            # jy: 注意此处加入的是 track[:] (即深拷贝), 如果直接加入
+            #     track (相当于浅拷贝), 后续对 track 的改变也会影响到
+            #     当前已加入的结果
+            ls_res.append(path[:])
+            return
+        if sum(path) > target:
+            return
+        
+        for i in range(start, len(candidates)):
+            path.append(candidates[i])
+            # jy: 相同元素可重复使用, 因此下一个查找位置仍从
+            #     当前位置开始找起
+            self._dfs_v2(candidates, path, target, i, ls_res)
+            path.pop()
+
+
+    """
+解法 3: 在解法 1 的基础上进行优化: 先将 candidates 排序, 递归搜索时如果当前
+数字大于 target, 则可终止搜索
+    """
+    def combinationSum_v3(self, candidates: List[int], target: int) -> List[List[int]]:
         result = []
         sorted_candidates = sorted(candidates)
-        self._dfs(sorted_candidates, 0, target, [], result)
+        self._dfs_v3(sorted_candidates, 0, target, [], result)
         return result
 
-    def _dfs(self, candidates, start, target, combination, result):
+    def _dfs_v3(self, candidates, start, target, combination, result):
         if target == 0:
             result.append(combination)
             return
@@ -129,7 +172,35 @@ candidates 即可避免结果重复
             if n > target:
                 break
                 #return
-            self._dfs(candidates, i, target - n, combination[:] + [n], result)
+            self._dfs_v3(candidates, i, target - n, combination[:] + [n], result)
+
+
+    """
+解法 4: 动态规划
+
+"零钱兑换" 问题输出为凑成总金额所需的最少硬币个数, 此题需输出所有可行解
+    """
+    def combinationSum_v4(self, candidates: List[int], target: int) -> List[List[int]]:
+        # jy: 用 dp[i] 记录 candidates 中的子组合之和为 i 的所有子组合,
+        #     因此最终返回 dp[target]
+        dp = {i:[] for i in range(target+1)}
+        # jy: 和为 0 的子组合为空组合 (注意, dp[0] 应用到 if 判断时结果为 True)
+        dp[0] = [[]]
+        # jy: 遍历列表中的每一个数值
+        for num in candidates:
+            # jy: 遍历该数值到 target 数值的所有数值, 如果 num 值大于 target,
+            #     则忽略跳过
+            for i in range(num, target+1):
+                # jy: 如果 i - num 的所有子组合已求解过, 则在已有子组合的基
+                #     础上进一步更新和为 i 的子组合结果
+                if dp[i - num]:
+                    # jy: ls_sub 中的数值之和为 i - num, 因此 ls_sub 中再加
+                    #     入 num 后, 数值之和即为 i
+                    for ls_sub in dp[i - num]:
+                        dp[i].append(ls_sub + [num])
+        # jy: 最终返回值为 target 的所有子组合
+        return dp[target]
+
 
 
 
@@ -143,21 +214,21 @@ print(res)
 candidates = [2, 3, 5]
 target = 8
 # Output: [[2, 2, 2, 2], [2, 3, 3], [3, 5]]
-res = Solution().combinationSum_v1(candidates, target)
+res = Solution().combinationSum_v2(candidates, target)
 print(res)
 
 
 candidates = [2]
 target = 1
 # Output: []
-res = Solution().combinationSum_v1(candidates, target)
+res = Solution().combinationSum_v3(candidates, target)
 print(res)
 
 
 candidates = [1]
 target = 1
 # Output: [[1]]
-res = Solution().combinationSum_v1(candidates, target)
+res = Solution().combinationSum_v4(candidates, target)
 print(res)
 
 

@@ -14,12 +14,12 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Combinations(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "UNDO 组合问题(元素无重复、不可复选) | "
 
 
 """
-Given two integers n and k, return all possible combinations of k numbers out of
-the range [1, n]. You may return the answer in any order.
+Given two integers `n` and `k`, return all possible combinations of `k`
+numbers out of the range [1, n]. You may return the answer in any order.
 
 
 Example 1:
@@ -116,6 +116,34 @@ class Solution:
         #    足 k 个元素了;
         for i in range(start, end - k + 2):
             self._dfs(k-1, i+1, end, combination[:] + [i], result)
+
+
+    """
+给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。你可以按 任何顺序 返回答案。
+这是标准的组合问题，但翻译一下就变成子集问题了：给你输入一个数组 nums = [1,2..,n] 和一个正整数 k，请你生成所有大小为 k 的子集。
+
+还是以 nums = [1,2,3] 为例，刚才78题让求所有子集，就是把所有节点的值都收集起来；现在只需要把第 2 层（根节点视为第 0 层）的节点收集起来，就是大小为 2 的所有组合：
+
+在代码上，只是需要添加结束条件：
+    """
+    def combine(self, n: int, k: int) -> List[List[int]]:
+        res, track = [], []
+        def backtrack(n,start,k):
+            # 结束条件 遍历到第k层时收集当前结果track
+            if len(track) == k:
+                res.append(track[:])
+                return # 后面的部分是不需要的 所以此处就可以结束了
+            # 对于所有选择
+            for i in range(start,n): # 选择列表是1到n之间的元素（包括n） 相当于nums = [1,..,n]
+                # 做选择
+                track.append(i)
+                # 递归
+                backtrack(n,i+1,k)
+                # 撤销选择
+                track.pop()
+        backtrack(n+1,1,k) # 选择列表是1到n之间的元素（包括n） 所以start从1开始 n+1结束（range是左闭右开）
+        return res
+
 
 
 n = 4
