@@ -18,23 +18,36 @@ tag_jy = ""
 
 
 """
-Given n non-negative integers representing an elevation map where the width of
-each bar is 1, compute how much water it is able to trap after raining.
+Given `n` non-negative integers representing an elevation map where the width
+of each bar is 1, compute how much water it is able to trap after raining.
 
 
-Example:    https://www.yuque.com/frederick/dtwi9g/xtgg31
-Input: [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]
+Example 1:
+https://www.yuque.com/it-coach/leetcode/zr7st5
+Input: height = [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]
 Output: 6
+Explanation: The above elevation map (black section) is represented by array
+             [0, 1, 0, 2, 1, 0, 1, 3, 2, 1, 2, 1]. In this case, 6 units of 
+             rain water (blue section) are being trapped.
+
+Example 2:
+Input: height = [4, 2, 0, 3, 2, 5]
+Output: 9
+ 
+
+Constraints:
+1) n == height.length
+2) 1 <= n <= 2 * 10^4
+3) 0 <= height[i] <= 10^5
 """
 
-from typing import List
 
 
 class Solution:
     """
-解法1: 如上图所示(见图例对应连接), 对于 i 处来说, 它的蓄水能力等同于 i 左边的最高高度
-和 i 右边的最高高度的较小者减去 i 处的高度, 所以可以遍历 height, 计算当前高度左边和右
-边的最高值, 然后减去当前的高度算出蓄水量;
+解法 1: 对于图例中的 i 处来说, 它的蓄水能力等同于 i 左边的最高高度和 i 右边
+的最高高度的较小者减去 i 处的高度, 所以可以遍历 height, 计算当前高度左边和右
+边的最高值, 然后减去当前的高度算出蓄水量
     """
     def trap_v1(self, height: List[int]) -> int:
         count = 0
