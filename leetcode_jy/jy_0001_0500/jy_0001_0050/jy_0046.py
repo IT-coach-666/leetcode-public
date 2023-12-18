@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Permutations(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "UNDO 排列问题 (全排列) | 相似题: 参考 permutation_combination_subset"
 
 
 """
@@ -68,6 +68,61 @@ class Solution:
         #    要去除当前数值(即第二个参数);
         for i, n in enumerate(nums):
             self._permute(count - 1, nums[0:i] + nums[i+1:], permutation + [n], permutations)
+
+
+    def permute(self, nums):
+        if not nums:
+            return
+        res = []
+        n = len(nums)
+        visited = [0] * n
+        def helper1(temp_list,length):
+            if length == n:
+                res.append(temp_list)
+            for i in range(n):
+                if visited[i] :
+                    continue
+                visited[i] = 1
+                helper1(temp_list+[nums[i]],length+1)
+                visited[i] = 0
+        def helper2(nums,temp_list,length):
+            if length == n:
+                res.append(temp_list)
+            for i in range(len(nums)):
+                helper2(nums[:i]+nums[i+1:],temp_list+[nums[i]],length+1)
+        helper1([],0)
+        return res
+
+    """
+给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案
+    """
+    def permute(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        # 选择列表就是nums包含的元素
+        # 使用used标记已经选择的数字 间接表示选择列表的变化
+        def backtrack(nums, path, used):
+            # 结束条件
+            if len(path) == len(nums):
+                res.append(path[:]) 
+                return
+            
+            for i in range(len(nums)):
+                if used[i]:
+                    # nums[i]已经选过 跳过
+                    continue
+                # 做选择
+                path.append(nums[i])
+                used[i] = True # 更新选择列表
+                # 递归
+                backtrack(nums, path, used)
+                # 撤销选择
+                path.pop()
+                used[i] = False # 回退选择列表的变化
+
+        # 初始时路径为空，所有元素都没有选择过所以used中都是False
+        backtrack(nums,[],[False for _ in range(len(nums))])
+        return res
+
 
 
 nums = [1, 2, 3]
