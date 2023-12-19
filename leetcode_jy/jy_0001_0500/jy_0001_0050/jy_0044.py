@@ -14,144 +14,163 @@ type_jy = "H"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "wildcard-matching(string)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "动态规划 | 双指针 |  | 相似题: 0010 (匹配规则有所不同)"
 
 
-
-'''
-Given an input string ``s`` and a pattern ``p``, implement wildcard pattern matching
-with support for '?' and '*'.
-'?' Matches any single character.
-'*' Matches any sequence of characters (including the empty sequence).
+"""
+Given an input string `s` and a pattern `p`, implement wildcard pattern
+matching with support for "?" and "*".
+1) "?" Matches any single character.
+2) "*" Matches any sequence of characters (including the empty sequence).
 
 The matching should cover the entire input string (not partial).
 
-Note:
-``s`` could be empty and contains only lowercase letters a-z.
-``p`` could be empty and contains only lowercase letters a-z, and characters like "?" or "*".
-
 
 Example 1:
-Input:
-s = "aa"
-p = "a"
+Input: s = "aa", p = "a"
 Output: false
 Explanation: "a" does not match the entire string "aa".
 
 Example 2:
-Input:
-s = "aa"
-p = "*"
+Input: s = "aa", p = "*"
 Output: true
 Explanation: '*' matches any sequence.
 
 Example 3:
-Input:
-s = "cb"
-p = "?a"
+Input: s = "cb", p = "?a"
 Output: false
-Explanation: '?' matches 'c', but the second letter is 'a', which does not match 'b'.
+Explanation: '?' matches 'c', but the second letter is 'a', which does not
+             match 'b'.
 
 Example 4:
-Input:
-s = "adceb"
-p = "*a*b"
+Input: s = "adceb", p = "*a*b"
 Output: true
-Explanation: The first '*' matches the empty sequence, while the second '*' matches the substring "dce".
+Explanation: The first '*' matches the empty sequence, while the second '*'
+             matches the substring "dce".
 
 Example 5:
-Input:
-s = "acdcb"
-p = "a*c?b"
+Input: s = "acdcb", p = "a*c?b"
 Output: false
-'''
+
+
+Constraints:
+1) 0 <= s.length, p.length <= 2000
+2) `s` contains only lowercase English letters.
+3) `p` contains only lowercase English letters, '?' or '*'.
+"""
 
 
 class Solution:
     """
-该题与 010_regular-expression-matching.py 类似, 只是匹配规则略有不同;
+解法 1: 动态规划
 
-010_regular-expression-matching.py 中规则:
-'.' Matches any single character.
-'*' Matches zero or more of the preceding element.
-   ("*" 匹配该字符之前的字符 0 次或多次)
+0010 (regular-expression-matching) 中的匹配规则:
+1) "." Matches any single character.
+2) "*" Matches zero or more of the preceding element. 
+   注意: 是匹配前一个字符 0 次或多次
 
-本题中的规则(注意, 其中的 "*" 也与 010_regular-expression-matching.py 中的不同):
-'?' Matches any single character.
-'*' Matches any sequence of characters (including the empty sequence).
-   ("*" 匹配任意 0 个或多个字符)
+本题中的匹配规则:
+1) "?" Matches any single character.
+2) "*" Matches any sequence of characters (including the empty sequence).
+   注意: "*" 匹配任意字符 0 个或多个字符
 
-动态规划; 定义 dp[i][j] = True 表示 s 的前 i 个字符(即 s[:i])和 p 的前 j 个字符(即 s[:j])匹配;
+
+定义 dp[i][j] = True 表示 s 的前 i 个字符 s[:i] 和 p 的前 j 个字符 p[:j] 匹配
     """
     def isMatch_v1(self, s: str, p: str) -> bool:
-        m, n = len(s), len(p)
-        dp = [[False for _ in range(n + 1)] for _ in range(m+1)]
+        len_s, len_p = len(s), len(p)
+        # jy: 初始化 dp 二维列表, 并设置 dp[0][0] 为 True (空字符与空匹配模
+        #     式相互匹配)
+        dp = [[False for _ in range(len_p + 1)] for _ in range(len_s+1)]
         dp[0][0] = True
 
-        for j in range(1, n+1):
-            # jy: 如果 p 的第 j 个字符 (即 p[j-1]) 为 "*", 则 s 的前 0 个字符(即空字符)与 p 的前 j
-            #     个字符的匹配情况等同于 s 的前 0 个字符(即空字符)与 p 的前 j-1 个字符的匹配情况;
+        for j in range(1, len_p+1):
+            # jy: 如果 p 的第 j 个字符 p[j-1] 为 "*", 则 dp[0][j] = dp[0][j-1],
+            #     即: s 的前 0 个字符 (空字符) 与 p 的前 j 个字符的匹配情况等同
+            #     于 s 的前 0 个字符 (即空字符) 与 p 的前 j-1 个字符的匹配情况
             if p[j-1] == '*':
                 dp[0][j] = dp[0][j-1]
-        # jy: 遍历 s 的第一到最后一个字符(i 代表第 i 个, 对应下标为 i-1 的字符)
-        for i in range(1, m+1):
-            # jy: 遍历 p 的第一个到最后一个字符(j 代表第 j 个, 对应下标为 j-1 的字符)
-            for j in range(1, n+1):
-                # jy: 如果 p 的第 j 个字符 (即 p[j-1]) 为 "*", 则以下条件满足其一即可表示 s 的前 i 个
-                #     字符与 p 的前 j 个字符匹配:
-                #     1) s 的前 i-1 与 p 的前 j 个的匹配(即 dp[i-1][j] 为 True); 因为当 s 的前 i-1 个
-                #        字符都与 p 的前 j 个字符匹配了, s 的第 i 个字符也同样可以被 p 的第 j 个字符 "*"
-                #        匹配到(因为 "*" 可匹配 0 个或多个任意字符, s 的第 i 个字符肯定可以被其匹配)
-                #     2) s 的前 i 个字符与 p 的前 j-1 个字符匹配(即 dp[i][j-1] 为 True); 因为当 s 的前
-                #        i 个字符与 p 的前 j-1 个字符匹配了, 且此时 p 的第 j 个字符为 "*", 由于其可以匹
-                #        配 0 个字符, 故此时也能确认 s 的前 i 个字符与 p 的前 j 个字符匹配;
+        # jy: 从前往后遍历 s 中的每一个字符 (为了便于理解, i 从 1 开始, 代表第
+        #     i 个字符, 对应的下标为 i-1, 即 s[i-1])
+        for i in range(1, len_s+1):
+            # jy: 从前往后遍历 p 中的每一个字符 (j 从 1 开始, 代表第 j 个, 对应
+            #     的下标为 j-1, 即 p[j-1])
+            for j in range(1, len_p+1):
+                # jy: 如果 p 的第 j 个字符 p[j-1] 为 "*", 则满足以下条件中的任
+                #     何一个即可确认 s 的前 i 个字符与 p 的前 j 个字符匹配:
+                #     1) s 的前 i-1 与 p 的前 j 个的匹配 (即 dp[i-1][j] == True)
+                #        因为当 s 的前 i-1 个字符已经与 p 的前 j 个字符匹配, 此
+                #        时 s 的第 i 个字符也同样可以被 p 的第 j 个字符 "*" 匹配
+                #        (因为 "*" 可匹配 0 个或多个任意字符)
+                #     2) s 的前 i 个字符与 p 的前 j-1 个字符匹配 (即 dp[i][j-1] == True)
+                #        因为当 s 的前 i 个字符与 p 的前 j-1 个字符匹配了, 且此
+                #        时 p 的第 j 个字符为 "*", 由于其可以匹配 0 个字符, 因
+                #        此也能确认 s 的前 i 个字符与 p 的前 j 个字符匹配
                 if p[j-1] == '*':
                     dp[i][j] = dp[i-1][j] or dp[i][j-1]
-                # jy: 如果 p 的第 j 个字符 (即 p[j-1]) 不为 "*", 则 s 的前 i 个字符与 p 的前 j 个字符只
-                #     有同时满足以下两个条件时才算匹配:
-                #     1) s 的前 i-1 个字符与 p 的前 j-1 个字符匹配;
-                #     2) s 的第 i 个字符与 p 的第 j 个字符相等(即 s[i-1] == p[j-1]), 或者 p 的第 j 个字符
-                #        (即 p[j-1]) 为 "?" (此时不管 s 的第 i 个字符是什么, "?" 都可以与之匹配)
+                # jy: 如果 p 的第 j 个字符 p[j-1] 不为 "*", 则只有确保 s 的前
+                #     i-1 个字符与 p 的前 j-1 个字符匹配 (dp[i-1][j-1] == True)
+                #     且满足以下任意一个条件时, 才能确保 s 的前 i 个字符与 p 的
+                #     前 j 个字符相互匹配:
+                #     1) s 的第 i 个字符与 p 的第 j 个字符相等 (即 s[i-1] == p[j-1])
+                #     2) p 的第 j 个字符 p[j-1] 为 "?" (此时不管 s 的第 i 个字
+                #        符是什么, "?" 都可以与之匹配)
                 else:
                     dp[i][j] = (s[i-1] == p[j-1] or p[j-1] == '?') and dp[i-1][j-1]
-        return dp[m][n]
+        return dp[len_s][len_p]
+
 
     """
-解法2: 参考  https://leetcode-cn.com/problems/wildcard-matching/solution/yi-ge-qi-pan-kan-dong-dong-tai-gui-hua-dpsi-lu-by-/
+解法 2: 动态规划
+
+讲解过程参考: https://www.yuque.com/it-coach/leetcode/qeuski 
     """
     def isMatch_v2(self, s: str, p: str) -> bool:
-        if set(p) == {"*"}: return True
-        # s横，p纵
-        # 土味拼音变量名
-        zong = len(p) + 1  # 纵轴长度
-        heng = len(s) + 1  # 横轴长度
+        """
+        s 作为横轴 (对应列), p 作为纵轴 (对应行)
 
-        table = [[False] * heng for i in range(zong)]
+        table[i][j] == True 表示 s 的前 j 个字符 s[:j] 与 p 的前 i 个字符
+        p[:i] 匹配; table[0][0] 初始化为 True, 表示 s[:0] 与 p[:0] (均为空
+        字符) 相互匹配
+        """
+        if set(p) == {"*"}: 
+            return True
+        # jy: 纵轴长度 (即行数, 比模式串 p 的长度多 1)
+        num_row = len(p) + 1
+        # jy: 横轴长度 (即列数, 比原字符串 s 的长度多 1)
+        num_column = len(s) + 1
+
+        # jy: 初始化表格, 左上角设置为 True
+        table = [[False] * num_column for i in range(num_row)]
         table[0][0] = True
 
+        # jy: 如果模式串 p 的第一个字符为 "*", 则将 table[1] 均设置为 True,
+        #     表明 s[:j] (j 为任意有效值) 均与 p[:1] 匹配 ("*" 能匹配任意字
+        #     符 0 次或多次) 
         if p.startswith("*"):
-            table[1] = [True] * heng
+            table[1] = [True] * num_column
 
-        for m in range(1, zong):
-            # 是否可以在该行使用 * 的特技
+        for m in range(1, num_row):
+            # jy: 标记是否可以在该行使用 "*" 的特技
             path = False
-            for n in range(1, heng):
+            for n in range(1, num_column):
                 if p[m-1] == "*":
                     if table[m-1][0]:
-                        table[m] = [True] * heng
-                        # jy: 此处补充 break 优化性能;
+                        table[m] = [True] * num_column
+                        # jy: 此处补充 break 优化性能
                         break
-                    # 只要顶上有了 True, 就可以开通 * 接下来的所有道路
+                    # jy; 只要顶上有了 True, 就可以开通 * 接下来的所有道路
                     if table[m-1][n]:
                         path = True
                     if path:
                         table[m][n] = True
-                # 先判断字母是否符合
+                # jy: 先判断字母是否符合
                 elif p[m-1] == "?" or p[m-1] == s[n-1]:
-                    # 再看左上方格子是不是 T
+                    # jy: 再看左上方格子是不是 T
                     table[m][n] = table[m-1][n-1]
 
-        return table[zong - 1][heng - 1]
+        return table[num_row - 1][num_column - 1]
+
 
     """
 解法3: 双指针法, 性能极佳;
