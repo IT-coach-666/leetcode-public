@@ -81,9 +81,9 @@ jy: 即从外圈到内圈, 一圈圈地都顺时针旋转 90 度, 总共只有 n
 
 
 matrix = \
-[ [1,2,3],
-  [4,5,6],
-  [7,8,9]]
+[ [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]]
 res = Solution().rotate(matrix)
 print(np.array(matrix))
 
@@ -95,5 +95,4 @@ matrix = \
 
 res = Solution().rotate(matrix)
 print(np.array(matrix))
-
 

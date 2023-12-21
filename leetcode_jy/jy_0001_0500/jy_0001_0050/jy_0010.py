@@ -14,7 +14,7 @@ type_jy = "H"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Regular-Expression-Matching(string)"
 # jy: 记录不同解法思路的关键词
-tag_jy = "动态规划 | UNDO"
+tag_jy = "动态规划 | UNDO | 相似题: 0044 (匹配规则有所不同)"
 
 
 """
