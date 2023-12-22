@@ -8,7 +8,7 @@ sys.path.append(dir_project)
 from leetcode_jy import *
 assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
        url_ == "www.yuque.com/it-coach"
-from typing import List, Dict
+from typing import List, Dict, Set
 # jy: 记录该题的难度系数
 type_jy = "H"
 # jy: 记录该题的英文简称以及所属类别
@@ -42,8 +42,6 @@ Explanation: There exist two distinct solutions to the 4-queens puzzle as shown 
 """
 
 
-import numpy as np
-from typing import List, Set
 class Solution:
     """
 核心解法就是一个个去试, 但是尝试的过程中可以过滤掉一些无需考虑的组合;
@@ -62,7 +60,7 @@ class Solution:
 所以, 可以使用 Set 来保存分别不能放置的行, 左斜对角线, 右斜对角线;
 当递归的深度达到了 n, 就说明我们找到了一组解;
     """
-    def solveNQueens(self, n: int) -> List[List[str]]:
+    def solveNQueens_v1(self, n: int) -> List[List[str]]:
         result = []
         self._dfs(0, n, set(), set(), set(), [], result)
         return [['.' * i + 'Q' + '.' * (n - i - 1) for i in solution]
@@ -89,8 +87,7 @@ class Solution:
 
 
 n = 4
-res = Solution().solveNQueens(n)
-print(np.array(res))
-print(len(res))
+res = Solution().solveNQueens_v1(n)
+print(res)
 
 

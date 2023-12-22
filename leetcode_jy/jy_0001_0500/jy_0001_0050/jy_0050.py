@@ -45,7 +45,7 @@ Either `x` is not zero or `n > 0`.
 
 class Solution:
     """
-解法 1: 递归
+解法 1: 递归 + 二分法
 
 由于 x^n = x^(2 * n/2), 因此可将 pow(x, n) 分解为 pow(x^2, n/2), 从而递归求解
 (注意: n 有可能是负数, 如果 n < 0, 则参与计算的 x 变为 1/x, n 变为 -n 即可)
@@ -128,6 +128,22 @@ class Solution:
         return result
 
 
+    """
+解法 4: 改写解法 1
+    """
+    def myPow_v4(self, x: float, n: int) -> float:
+        if n < 0:
+            return self.myPow_v4(1/x, -n)
+        elif n == 0:
+            return 1
+        elif n == 1:
+            return x
+     
+        if n % 2:
+            return x * self.myPow_v4(x*x, n//2)
+        else:
+            return self.myPow_v4(x*x, n//2)
+
 
 
 x = 2.00000
@@ -147,8 +163,14 @@ print(res)
 x = 2.00000
 n = -2
 # jy: 0.25000
-res = Solution().myPow_v1(x, n)
+res = Solution().myPow_v3(x, n)
 print(res)
 
+
+x = 2.00000
+n = -2
+# jy: 0.25000
+res = Solution().myPow_v4(x, n)
+print(res)
 
 
