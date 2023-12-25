@@ -10,8 +10,8 @@ assert project_name == "leetcode_jy" and project_name == "leetcode_jy" and \
        url_ == "www.yuque.com/it-coach"
 from typing import List, Dict
 # jy: 记录该题的难度系数
-type_jy = ""
+type_jy = "S"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "UNDO-plus"
