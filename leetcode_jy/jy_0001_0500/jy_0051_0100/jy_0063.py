@@ -19,16 +19,15 @@ tag_jy = ""
 
 
 """
-You are given an m x n integer array grid. There is a robot initially located
-at the top-left corner (i.e., grid[0][0]). The robot tries to move to the 
-bottom-right corner (i.e., grid[m-1][n-1]). The robot can only move either 
-down or right at any point in time.
+You are given an m x n integer array `grid`. There is a robot initially
+located at the top-left corner (i.e., grid[0][0]). The robot tries to move
+to the bottom-right corner (i.e., grid[m-1][n-1]). The robot can only move
+either down or right at any point in time.
 
-An obstacle and space are marked as 1 or 0 respectively in grid. A path that
-the robot takes cannot include any square that is an obstacle.
-
-Return the number of possible unique paths that the robot can take to reach
-the bottom-right corner.
+An obstacle and space are marked as 1 or 0 respectively in `grid`. A path
+that the robot takes cannot include any square that is an obstacle. Return
+the number of possible unique paths that the robot can take to reach the 
+bottom-right corner.
 
 The testcases are generated so that the answer will be less than or equal to
 2 * 10^9.
@@ -54,10 +53,10 @@ Output: 1
  
 
 Constraints:
-m == obstacleGrid.length
-n == obstacleGrid[i].length
-1 <= m, n <= 100
-obstacleGrid[i][j] is 0 or 1.
+1) m == obstacleGrid.length
+2) n == obstacleGrid[i].length
+3) 1 <= m, n <= 100
+4) obstacleGrid[i][j] is 0 or 1.
 """
 
 
@@ -68,19 +67,19 @@ class Solution:
     """
     def uniquePathsWithObstacles_v1(self, obstacleGrid: List[List[int]]) -> int:
         #新建矩阵版
-        height, width = len(obstacleGrid),len(obstacleGrid[0])
-        store = [[0]*width for i in range(height)]
+        m, width = len(obstacleGrid), len(obstacleGrid[0])
+        store = [[0]*width for i in range(m)]
 
         #从上到下，从左到右
-        for m in range(height):#每一行
+        for i in range(m):#每一行
             for n in range(width):#每一列
-                if not obstacleGrid[m][n]: #如果这一格没有障碍物
-                    if m == n == 0: #或if not(m or n)
+                if not obstacleGrid[i][n]: #如果这一格没有障碍物
+                    if i == n == 0: #或if not(m or n)
                         store[m][n] = 1
                     else:
-                        a = store[m-1][n] if m!=0 else 0 #上方格子
-                        b = store[m][n-1] if n!=0 else 0 #左方格子
-                        store[m][n] = a+b
+                        a = store[i-1][n] if i !=0 else 0 #上方格子
+                        b = store[i][n-1] if n!=0 else 0 #左方格子
+                        store[i][n] = a+b
         return store[-1][-1]
 
 
