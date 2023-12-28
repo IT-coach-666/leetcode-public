@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Unique-Paths(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = "动态规划 | 递归 + 缓存"
+tag_jy = "动态规划 | 递归 + 缓存 | 相似题: arr_dim_2_path"
 
 
 """
@@ -87,6 +87,7 @@ dp[i][j] = dp[i-1][j] + dp[i][j-1]
     def uniquePaths_v2(self, m: int, n: int) -> int:
         dp = [[0] * n for _ in range(m)]
 
+        # jy: 从上到下遍历每一行, 从左到右遍历每一列
         for i in range(m):
             for j in range(n):
                 # jy: 从位置 (0, 0) 走到第一行或第一列的任何位置的路径始终只
@@ -168,7 +169,7 @@ dp[i][j] = dp[i-1][j] + dp[i][j-1]
 
 以上递归解法 3-5 均会超时, 因为有很多子问题被不断重复计算
     """
-    def uniquePaths(self, m: int, n: int) -> int:
+    def uniquePaths_v6(self, m: int, n: int) -> int:
         dict_ = {}
         def dfs(i, j):
             if i == 0 or j == 0:
@@ -215,7 +216,20 @@ print(res)
 m = 23
 n = 12
 # Output: 6
-res = Solution().uniquePaths_v3(m, n)
+res = Solution().uniquePaths_v4(m, n)
 print(res)
 
+
+m = 23
+n = 12
+# Output: 6
+res = Solution().uniquePaths_v5(m, n)
+print(res)
+
+
+m = 23
+n = 12
+# Output: 6
+res = Solution().uniquePaths_v6(m, n)
+print(res)
 
