@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Unique-Paths-II(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = " | 相似题: arr_dim_2_path"
+tag_jy = "动态规划 | 递归 + 缓存 | 相似题: arr_dim_2_path"
 
 
 

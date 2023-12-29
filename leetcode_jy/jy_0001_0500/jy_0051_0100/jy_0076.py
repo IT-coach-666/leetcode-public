@@ -14,43 +14,42 @@ type_jy = "H"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Minimum-Window-Substring(string)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "滑动窗口 + 巧用字典 | IMP2"
 
 
 
 """
-Given two strings ``s`` and ``t`` of lengths ``m`` and ``n`` respectively, return
-the minimum window substring of ``s`` such that every character in ``t`` (including
-duplicates) is included in the window. If there is no such substring, return the
-empty string "".
+Given two strings `s` and `t` of lengths `m` and `n` respectively, return the
+minimum window substring of `s` such that every character in `t` (including
+duplicates) is included in the window. If there is no such substring, return
+the empty string "".
 
-The test cases will be generated such that the answer is unique. A substring is a
-contiguous sequence of characters within the string.
+The test cases will be generated such that the answer is unique.
 
 
 Example 1:
 Input: s = "ADOBECODEBANC", t = "ABC"
 Output: "BANC"
-Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C' from
-             string t.
+Explanation: The minimum window substring "BANC" includes 'A', 'B', and 'C'
+             from string `t`.
 
 Example 2:
 Input: s = "a", t = "a"
 Output: "a"
-Explanation: The entire string s is the minimum window.
+Explanation: The entire string `s` is the minimum window.
 
 Example 3:
 Input: s = "a", t = "aa"
 Output: ""
-Explanation: Both 'a's from ``t`` must be included in the window. Since the largest
-             window of ``s`` only has one 'a', return empty string.
+Explanation: Both 'a's from `t` must be included in the window. Since the
+             largest window of `s` only has one 'a', return empty string.
 
 
 Constraints:
-m == s.length
-n == t.length
-1 <= m, n <= 10^5
-s and t consist of uppercase and lowercase English letters.
+1) m == s.length
+2) n == t.length
+3) 1 <= m, n <= 10^5
+4) `s` and `t` consist of uppercase and lowercase English letters.
 
 
 Follow up: Could you find an algorithm that runs in O(m + n) time?
@@ -58,28 +57,34 @@ Follow up: Could you find an algorithm that runs in O(m + n) time?
 
 
 import collections
-import sys
 
 
-# Time Limit Exceeded!
 class Solution:
     """
-解法1(超时): 暴力求解, 遍历 s, 以当前字符串为起始, 向后遍历字符串, 直到当前字符串中
-每个字符的个数能够组成 t, 更新符合条件的窗口;
+解法 1: 暴力求解 (超时)
+
+遍历 s 的每一个下标位置, 以当前下标位置为滑动窗口的起始下标, 向后遍历
+字符串, 直到当前窗口中的字符串包含 t 的所有字符, 表明在指定起始下标中
+找到了一个满足要求的最小窗口, 如果该窗口比之前的窗口小, 则更新最小窗口
     """
     def minWindow_v1(self, s: str, t: str) -> str:
         min_window = ''
         min_window_length = sys.maxsize
         len_s = len(s)
-        # jy-version-1-Begin------------------------------------------------------
-        # jy: 尝试以字符串的每个位置下标为窗口的起始下标;
-        for start in range(len_s):
-            # jy: 统计目标字符串 t 的各个字符的个数;
-            char_counter = collections.Counter(t)
-            # jy: 记录满足要求的窗口的 end 下标位置是否已找到;
-            is_end_finded = False
 
-            # jy: 窗口的末尾下标 end 初始化为与起始下标相同;
+        # jy: 尝试以字符串的每个位置下标为窗口的起始下标
+        start = 0
+        while start < len_s:
+            # jy: 统计目标字符串 t 的各个字符的个数
+            char_counter = collections.Counter(t)
+
+            # jy: 优化: 满足要求的最小子串的起始下标 start 对应的字符必定
+            #     在 t 中, 如果 start 对应的字符不在 t 中, 直接后移 start,
+            #     减少后续不必要的 while 逻辑
+            while start < len_s and s[start] not in char_counter:
+                start += 1
+
+            # jy: 初始化窗口的末尾下标
             end = start
             # jy: 末尾下标 end 不断右移, 在有效的末尾下标中不断查找, 当 end 下标位置对应
             #     的字符在 char_counter 中且该字符的个数仍大于 1 时, 将其个数减 1, 直到
@@ -88,49 +93,22 @@ class Solution:
             while end < len_s:
                 if s[end] in char_counter and char_counter[s[end]] >= 1:
                     char_counter[s[end]] -= 1
+                # jy: 如果找到一个满足要求的窗口, 即为以 start 开头的滑动窗口中的最小窗
+                #     口, 如果该窗口比之前的窗口小, 则更新最小窗口, 并退出循环, 遍历下
+                #     一个滑动窗口
                 if sum(char_counter.values()) == 0:
-                    is_end_finded = True
-                    break
-                end += 1
-            # jy: 如果以上退出 while 循环后的 end 下标满足要求, 且窗口长度小于之前记录的最
-            #     小窗口长度, 则更新最小窗口长度;
-            if is_end_finded and end - start + 1 < min_window_length:
-                min_window_length = end - start + 1
-                min_window = s[start: end + 1]
-        # jy-version-1-End--------------------------------------------------------
-        # jy-version-2-Begin------------------------------------------------------
-        '''
-        # jy: 对以上 version-1 进行优化: 
-        #     1) 满足要求的最小子串的起始下标 start 对应的字符必定是在 t 中的字符, 因此如
-        #        果 start 对应的字符不在 t 中, 直接后移 start, 减少后续不必要的 while 逻
-        #        辑;
-        #     2) 在找到满足要求的 end 下标时, 直接判断此时的窗口是否更小, 是否应更新; 减少
-        #        不必要的代码量;
-        start = 0
-        while start < len_s:
-            char_counter = collections.Counter(t)
-
-            while start < len_s and s[start] not in char_counter:
-                start += 1
-
-            end = start
-            while end < len_s:
-                if s[end] in char_counter and char_counter[s[end]] >= 1:
-                    char_counter[s[end]] -= 1
-                if sum(char_counter.values()) == 0 and \
-                        end - start + 1 < min_window_length:
-                    min_window_length = end - start + 1
-                    min_window = s[start: end + 1]
+                    if end - start + 1 < min_window_length:
+                        min_window_length = end - start + 1
+                        min_window = s[start: end + 1]
                     break
                 end += 1
             start += 1
-        '''
-        # jy-version-2-End--------------------------------------------------------
         return min_window
 
+
     """
-解法2: 滑动窗口; 
-1) start 不断右移, 直到对应的字符在 t 中, 将其作为窗口的起始下标;
+解法 2: 滑动窗口 (IMP)
+1) start 不断右移, 直到对应的字符在 t 中, 将其作为窗口的起始下标
 2) 找窗口的末尾下标, 使得窗口能满足条件; 找到后判断是否更新最小窗口; (即固定 start, 找
    出该情况下满足条件的 end 最小下标, 使得窗口是以 start 作为起始下标时的最小窗口)
 3) 更新 start, 确保 start 得到更新, 且其对应的字符仍在 t 中, 继续循环以上操作, 找新的 end;
@@ -138,54 +116,68 @@ class Solution:
     """
     def minWindow_v2(self, s: str, t: str) -> str:
         len_s = len(s)
-        # jy: 记录目标字符串的字符及其出现个数
+        # jy: 理解该题的关键要先理解 char_counter 和 count:
+        #     char_counter: 统计当前窗口对应的子串中, 目标字
+        #                   符串 t 中每个类型的字符缺几个
+        #     count: 统计还缺几个字符就能包含所有目标字符串
+        # jy: 注意: 因为后续的逻辑中 char_counter 字典中某些字符对应的值
+        #     可能是负数 (表示对于某些字符已经找到超过目标个数多少个了)
         char_counter = collections.Counter(t)
-        # jy: 记录窗口的起止下标位置, 初始化为一个极大值;
+        count = len(t)
+
+        # jy: 记录窗口的首末下标位置, 初始化为一个极大值
         min_window = (0, sys.maxsize)
-        # jy: 记录滑动窗口的起始下标位置, 满足要求的滑动窗口的起始下标位置对应的字符必定在
-        #     t 中出现;
+
+        # jy: 找出滑动窗口的起始下标 (满足要求的滑动窗口的起始下标位置
+        #     对应的字符必定在 t 中存在)
         start = 0
         while start < len_s and s[start] not in char_counter:
             start += 1
-        # jy: 记录剩余待查找的目标字符个数;
-        count = len(t)
-        # jy: 从 start 下标位置开始尝试将字符串的各个字符下标作为滑动窗口的末尾下标;
+
+        # jy: 从 start 下标位置开始尝试将字符串的各个字符下标作为滑动窗
+        #     口的末尾下标
         for end in range(start, len_s):
             print(start, end)
-            # jy: 如果当前下标对应的字符不在 char_counter 中, 表明当前 end 不可能满足要求,
-            #     直接进行下一轮 for 循环(end + 1);
+            # jy: 如果当前下标对应的字符不在 char_counter 中, 表明当前
+            #     end 不可能满足要求, end 直接跳到下一位
             if s[end] not in char_counter:
                 continue
 
-            # jy: 执行到此处表明当前字符在 t 中, 在 char_counter 中将该字符的个数减 1;
-            #     1) 如果该字符在 char_counter 中的记录个数大于等于 0, 表明当前的该字符
-            #        是 t 的组成部, count 数也相应减 1;
-            #     2) 如果该字符在 char_counter 中的记录个数小于 0, 表明虽然该字符在 t 中
-            #        出现, 但 t 中已找到足够的该字符, 此时 count 不能减 1, 当前 end 下标
-            #        对应的字符并非目标查找字符;
+            # jy: 执行到此处表明当前字符为 t 中的一员, 在 char_counter 中
+            #     将该字符的个数减 1, 表明将当前字符加入到滑动窗口后, 目
+            #     标字符串中该字符的缺失数量少 1:
+            #     1) 如果该字符在 char_counter 中的记录个数大于等于 0, 表
+            #        明当前的该字符是 t 的组成部分, count 数也相应减 1
+            #     2) 如果该字符在 char_counter 中的记录个数小于 0, 表明当
+            #        前滑动窗口中的该字符虽然在 t 中出现, 但已找到足够的
+            #        该字符, 此时 count 不能减 1, 当前 end 对应的字符不能
+            #        使得滑动窗口满足要求, 仍需继续向后遍历找其它类型的字符
             char_counter[s[end]] -= 1
             if char_counter[s[end]] >= 0:
                 count -= 1
-                # jy: 如果 count 为 0, 表明当前 (start, end) 是一个满足条件的窗口, 判断
-                #     该窗口是否比之前的窗口记录小, 小则更新; 由于需要寻找下一个滑动窗口,
-                #     因此 start 下标位置要得到更新(更新为下一个出现在 t 中的下标位置),
-                #     在更新之前需要先将原 start 对应的字符(必定是在 t 中的)的信息恢复到
-                #     char_counter 和 count 中;
                 while count == 0:
-                    min_window = (start, end) if \
-                        end - start < min_window[1] - min_window[0] else min_window
-                    # jy: 恢复原 start 下标位置的字符在 char_counter 和 count 中的统计信
-                    #     息;
+                    # jy: 如果 count 为 0, 表明当前 (start, end) 是一个满足条件
+                    #     的窗口, 判断该窗口是否比之前的窗口记录小, 小则更新
+                    if end - start < min_window[1] - min_window[0]:
+                        min_window = (start, end)
+
+                    # jy: 恢复原 start 下标位置的字符 (该字符存在于 t 中) 在
+                    #     char_counter 和 count 中的统计信息, 并同时让 count
+                    #     加 1, 表明下一个窗口中差一个字符才满足要求
                     char_counter[s[start]] += 1
+                    # UNDO
                     if char_counter[s[start]] > 0:
                         count += 1
-                    # jy: 更新 start 下标为下一个出现在 t 中的下标位置(该更新方式较为粗糙,
-                    #     导致执行效率不如方法 3);
+
+                    # jy: 更新 start 下标, 要求 start 对应的字符必须出现在 t 中
+                    #     (该更新方式较为粗糙, 使得执行效率不如方法 3)
                     start += 1
                     while start < len_s and s[start] not in char_counter:
                         start += 1
 
+        # jy: 返回最小滑动窗口对应的字符串
         return "" if min_window[1] > len_s else s[min_window[0]: min_window[1]+1]
+
 
     """
 解法 3: 思路同解法 2, 代码执行效率更高;
@@ -274,6 +266,5 @@ t = "ABC"
 # Output: "ABC"
 res = Solution().minWindow_v3(s, t)
 print(res)
-
 
 
