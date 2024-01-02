@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "subsets(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = "子集问题 (元素无重复、不可复选) | 相似题: 参考 permutation_combination_subset"
+tag_jy = "子集问题 (元素无重复、不可复选) IMP | 相似题: 参考 permutation_combination_subset"
 
 
 """
@@ -86,9 +86,10 @@ class Solution:
 解法 3: 循环/迭代
     """
     def subsets_v3(self, nums: List[int]) -> List[List[int]]:
+        # jy: 空集是任何集合的子集
         ls_res = [[]]
         for i in nums:
-            ls_res = ls_res + [[i] + num for num in ls_res]
+            ls_res += [[i] + ls_num for ls_num in ls_res]
         return ls_res
 
 
