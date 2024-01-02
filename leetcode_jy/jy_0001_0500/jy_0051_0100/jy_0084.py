@@ -19,17 +19,18 @@ tag_jy = ""
 
 
 """
-Given an array of integers ``heights`` representing the histogram's bar height where 
-the width of each bar is 1, return the area of the largest rectangle in the histogram.
+Given an array of integers `heights` representing the histogram's bar height
+where the width of each bar is 1, return the area of the largest rectangle
+in the histogram.
 
 
-Example 1:    https://www.yuque.com/frederick/dtwi9g/eohups
-Input: heights = [2,1,5,6,2,3]
+Example 1: 图示参考: https://www.yuque.com/it-coach/leetcode/srglxmgx5mcq8l2i
+Input: heights = [2, 1, 5, 6, 2, 3]
 Output: 10
-Explanation: The above is a histogram where width of each bar is 1. The largest rectangle
-             is shown in the red area, which has an area = 10 units.
+Explanation: The above is a histogram where width of each bar is 1. The largest
+             rectangle is shown in the red area, which has an area = 10 units.
 
-Example 2:
+Example 2: 图示参考: https://www.yuque.com/it-coach/leetcode/srglxmgx5mcq8l2i
 Input: heights = [2,4]
 Output: 4
 
@@ -40,29 +41,31 @@ Constraints:
 """
 
 
-from typing import List
-
-
 class Solution:
     """
-维护一个栈保存递增的高度的索引位置(栈中的位置索引不需要总是确保连续):
-1) 如果当前栈为空或当前高度大于栈顶的高度, 则持续入栈;
-2) 如果当前高度小于栈顶的高度, 则需要根据栈中的高度计算面积: 先弹出栈顶的元素, 作
-   为计算面积的高, 再将当前栈顶距离当前高度所在位置下标相隔的距离作为宽度, 求得面
-   积后更新至今遇到的最大面积
+解法 1: 栈
+
+栈中保存递增的高度的索引位置 (栈中的位置索引不需确保连续):
+1) 如果当前栈为空或当前高度大于栈顶元素的高度, 则持续入栈
+2) 如果当前高度小于栈顶元素的高度, 则需根据栈中的高度计算面积:
+   a) 先弹出栈顶的元素, 作为计算面积的高
+   b) 再将当前栈顶距离当前高度所在位置下标相隔的距离作为宽度, 求得面
+      积后更新至今遇到的最大面积
     """
-    def largestRectangleArea(self, heights: List[int]) -> int:
+    def largestRectangleArea_v1(self, heights: List[int]) -> int:
         # jy: 一个栈, 用于保存递增的高度的索引位置(索引不需要连续)
         stack = []
         max_area = 0
-        length = len(heights)
+
+        len_ = len(heights)
         i = 0
 
-        while i <= length:
+        # jy: 循环遍历至末尾下标之后的一个位置
+        while i <= len_:
             # jy-version-1-begin: ----------------------------------------------
             """
             # jy: 如果 i 等于数组长度, 表明数组已经遍历完成, 当前位置的高度为 0;
-            current_height = 0 if i == length else heights[i]
+            current_height = 0 if i == len_ else heights[i]
             # jy: 如果当前位置高度大于或等于栈顶对应的位置的高度, 则不断将当前位置
             #    入栈, 并将位置进一位;
             if not stack or current_height >= heights[stack[-1]]:
@@ -72,12 +75,12 @@ class Solution:
             # jy-version-1-end: ------------------------------------------------
 
             # jy-version-2-begin: ----------------------------------------------
-            if i < length and (not stack or heights[i] >= heights[stack[-1]]):
+            if i < len_ and (not stack or heights[i] >= heights[stack[-1]]):
                 stack.append(i)
                 i += 1
-            # jy: 如果下标 i 等于 length, 且栈为空, 则可终止(如果栈不为空, 则需要不
-            #    断出栈并基于该下标 i 计算面积);
-            elif i == length and not stack:
+            # jy: 如果下标 i 等于 len_, 且栈为空, 则可终止 (如果栈不为空, 则需
+            #     要不断出栈并基于下标 i 计算面积)
+            elif i == len_ and not stack:
                 #i += 1
                 break
             # jy-version-2-end: ------------------------------------------------
@@ -96,15 +99,16 @@ class Solution:
         return max_area
 
 
-heights = [2,1,5,6,2,3]
-# Output: 10
-res = Solution().largestRectangleArea(heights)
+
+heights = [2, 1, 5, 6, 2, 3]
+res = Solution().largestRectangleArea_v1(heights)
+# jy: 10
 print(res)
 
 
-heights = [2,4]
-# Output: 4
-res = Solution().largestRectangleArea(heights)
+heights = [2, 4]
+res = Solution().largestRectangleArea_v1(heights)
+# jy: 4
 print(res)
 
 
