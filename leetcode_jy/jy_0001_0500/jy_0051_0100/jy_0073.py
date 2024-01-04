@@ -14,111 +14,135 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Set-Matrix-Zeroes(array_dim_2)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "逐位置遍历 + 数据结构技巧"
 
 
 """
-Given a m x n matrix, if an element is 0, set its entire row and column to 0. Do it in-place.
+Given an m x n integer matrix `matrix`, if an element is 0, set its entire
+row and column to 0's. You must do it in place.
+
+
 Example 1:
 Input:
-[ [1,1,1],
-  [1,0,1],
-  [1,1,1]]
+[[1, 1, 1],
+ [1, 0, 1],
+ [1, 1, 1]]
 Output:
-[ [1,0,1],
-  [0,0,0],
-  [1,0,1]]
+[[1, 0, 1],
+ [0, 0, 0],
+ [1, 0, 1]]
 
 Example 2:
 Input:
-[ [0,1,2,0],
-  [3,4,5,2],
-  [1,3,1,5]]
+[[0, 1, 2, 0],
+ [3, 4, 5, 2],
+ [1, 3, 1, 5]]
 Output:
-[ [0,0,0,0],
-  [0,4,5,0],
-  [0,3,1,0]]
+[[0, 0, 0, 0],
+ [0, 4, 5, 0],
+ [0, 3, 1, 0]]
+
+
+Constraints:
+1) m == matrix.length
+2) n == matrix[0].length
+3) 1 <= m, n <= 200
+4) -2^31 <= matrix[i][j] <= 2^31 - 1
+
 
 
 Follow up:
-• A straight forward solution using O(m*n) space is probably a bad idea.
-• A simple improvement uses O(m+n) space, but still not the best solution.
-• Could you devise a constant space solution?
+1) A straight forward solution using O(m*n) space is probably a bad idea.
+2) A simple improvement uses O(m+n) space, but still not the best solution.
+3) Could you devise a constant space solution?
 """
 
 
-
-from typing import List
-import numpy as np
 class Solution:
     """
-解法1: 题目本身比较简单, 遍历矩阵, 遇到 0 则将该行, 该列的数都置为 0, 需要注意置为 0 的
-过程中原来就存在矩阵中的 0, 为了区别这些数, 额外开辟了个相同大小的矩阵来保存已经被访问过的 0;
+解法 1: 逐个位置遍历并设置
+
+遍历矩阵, 遇到 0 则将该行、该列的数都置为 0
+
+注意: 置为 0 的过程中需记录原来就为 0 的位置
     """
     def setZeroes_v1(self, matrix: List[List[int]]) -> None:
         if not matrix:
             return
-        # jy: m 行 n 列;
+        # jy: m 行 n 列
         m, n = len(matrix), len(matrix[0])
-        # jy: 将当前遍历到为 0 的位置设置为 True, 并将该位置的行和列中原先不为 0, 但现在已设置
-        #    为 0 的位置设置为 True; 原先为 0 且还没遍历到的位置对应的值仍为 False;
+        # jy: 初始化一个同样大小的矩阵, 用以记录 0 是否被处理过: 将为 0 的位
+        #     置设置为 True, 并将该位置的行和列中原先不为 0 但现在已设置为 0
+        #     的位置设置为 True; 原先为 0 的位置对应的值为 False
         visited = [[False for _ in range(n)] for _ in range(m)]
         # jy: 遍历矩阵;
         for i in range(m):
             for j in range(n):
-                # jy: 如果遍历到数值 0 且该数值之前没有被处理(visited 中的值为 False), 则设置
-                #    相应的行列为 0, 且行列中原先不为 0 的位置对应的 visited 值为 True, 原先
-                #    就为 0 的则其对应的 visited 人仍为 False;
+                # jy: 如果当前位置为 0 且该位置没被处理 (visited 中该位置的值
+                #     为 False), 则设置相应的行列为 0, 且行列中原先不为 0 的
+                #     位置对应的 visited 该位置的值为 True, 原先就为 0 的位置
+                #     则对应的 visited 仍为 False (表示原先的 0 还未被处理)
                 if matrix[i][j] == 0 and not visited[i][j]:
-                    # jy: 设置第 j 列为 0, 如果原先就为 0 了, 则其对应的位置的 visited 值仍为 False
+                    # jy: 将第 j 列的非 0 值设置为 0, 并将 visited 中的该相应
+                    #     位置的值设置为 True (表示该 0 值已经被处理完)
                     for k in range(m):
                         #if matrix[k][j] != 0:
                         if k != i and matrix[k][j] != 0:
                             matrix[k][j] = 0
                             visited[k][j] = True
-                    # jy: 设置第 i 行为 0, 如果原先就为 0 了, 则其对应的位置的 visited 值仍为 False
+
+                    # jy: 将第 i 行为的非 0 值设置为 0, 并将 visited 中的该相应
+                    #     位置的值设置为 True (表示该 0 值已经被处理完)
                     for k in range(n):
                         #if matrix[i][k] != 0:
                         if k != j and matrix[i][k] != 0:
                             matrix[i][k] = 0
                             visited[i][k] = True
-                    # jy: 由于以上两个 for 循环中都有 k != i 和 k != j, 所以此处需要补充设置(否则可
-                    #    不设置);
+                    # jy: 由于以上两个 for 循环中都有 k != i 和 k != j, 所以此处
+                    #     需要补充设置 visited 中当前 (i, j) 位置为 True, 表示该
+                    #     位置的 0 已经被处理 (如果以上 for 循环中没有 k != i 或
+                    #     k != j, 则在 for 循环中就已经设置了该位置, 此处可省略)
                     visited[i][j] = True
 
     """
-解法2: 为了减少额外空间的消耗, 可以首先计算出哪些列, 哪些行需要置为 0, 然
-后再遍历一次矩阵将需要置为 0 的数字置为 0;
+解法 2: 优化解法 1 中的空间复杂度
+
+先计算出需要置为 0 的列和行, 然后再遍历一次矩阵将相应的列和行置为 0
     """
     def setZeroes_v2(self, matrix: List[List[int]]) -> None:
         if not matrix:
             return
-        # jy: m 行 n 列;
+        # jy: m 行 n 列
         m, n = len(matrix), len(matrix[0])
         rows, columns = set(), set()
-        # jy: 遍历矩阵, 将需要设置为 0 的行列放入 rows 和 columns 集合中;
+        # jy: 遍历矩阵, 将需要设置为 0 的行和列分别放入 rows 和 columns
         for i in range(m):
             for j in range(n):
                 if matrix[i][j] == 0:
                     rows.add(i)
                     columns.add(j)
-        # jy: 遍历矩阵的行和列, 如果行或列在相应的集合中, 则将矩阵的对应值置为 0;
+
+        # jy: 再次遍历矩阵, 将指定的行和列设置为 0
         for i in range(m):
             for j in range(n):
                 if i in rows or j in columns:
                     matrix[i][j] = 0
 
     """
-解法3: 最后题目要求算法的空间复杂度是常数级别, 这里巧妙的将解法 2 中记录哪些行, 列需要
-置为 0 的信息放在了矩阵的第一行和第一列中, 由于第一行, 第一列的信息被修改, 所以需要额
-外两个变量来标记最后第一行, 第一列是否都要置为0;
+解法 3: 优化解法 2 的空间复杂度至常数级
+
+将解法 2 中需要置为 0 的行和列信息放在矩阵的第一行和第一列中; 由于第一行和第
+一列的信息会被修改, 因此不能直接基于第一行或第一列中是否有 0 值来判断第一行或
+第一列是否需应设置为 0, 所以需要额外两个变量来标记第一行和第一列是否都要置为 0
     """
     def setZeroes_v3(self, matrix: List[List[int]]) -> None:
         if not matrix:
             return
-        # jy: m 行 n 列;
+        # jy: m 行 n 列
         m, n = len(matrix), len(matrix[0])
+        # jy: is_first_row_zero 为 True 时表明第一行要置为 0
         is_first_row_zero = False
+        # jy: is_first_column_zero 为 True 时表明第一列需要置为 0
         is_first_column_zero = False
 
         # jy: 遍历矩阵, 如果矩阵的对应位置值为 0, 如果是第 1 行中的, 表明第 1 行要全置为 0;
@@ -127,14 +151,52 @@ class Solution:
         for i in range(m):
             for j in range(n):
                 if matrix[i][j] == 0:
+                    # jy: 如果该位置处于第一行, 表明第一行需要置为 0
                     if i == 0:
                         is_first_row_zero = True
+                    # jy: 如果该位置处于第一列, 表明第一列需要置为 0
                     if j == 0:
                         is_first_column_zero = True
+                    # jy: 表明第 i 行需要设置为 0
+                    matrix[i][0] = 0
+                    # jy: 表明第 j 列需要设置为 0
+                    matrix[0][j] = 0
+
+        # jy: 再次遍历矩阵, 将除第一行和第一列之外的其它行和列的相应位置设置为 0
+        #     第一行和第一列是否置为 0 需要基于另外两个变量判断
+        for i in range(1, m):
+            for j in range(1, n):
+                if matrix[i][0] == 0 or matrix[0][j] == 0:
+                    matrix[i][j] = 0
+
+        # jy: 如果 is_first_row_zero 为 True, 则将第一行设置为 0
+        if is_first_row_zero:
+            for i in range(n):
+                matrix[0][i] = 0
+
+        # jy: 如果 is_first_column_zero 为 True, 则将第一列设置为 0
+        if is_first_column_zero:
+            for i in range(m):
+                matrix[i][0] = 0
+
+
+    """
+解法 4: 简化解法 3 中的代码
+    """
+    def setZeroes_v4(self, matrix: List[List[int]]) -> None:
+        if not matrix:
+            return
+
+        m, n = len(matrix), len(matrix[0])
+        is_first_row_zero = True if 0 in matrix[0][:] else False
+        is_first_column_zero = True if 0 in matrix[:][0] else False
+
+        for i in range(m):
+            for j in range(n):
+                if matrix[i][j] == 0:
                     matrix[i][0] = 0
                     matrix[0][j] = 0
 
-        # jy: 遍历矩阵, 如果该行或列的第一个元素为 0, 则表明矩阵的该位置需要置为 0;
         for i in range(1, m):
             for j in range(1, n):
                 if matrix[i][0] == 0 or matrix[0][j] == 0:
@@ -147,89 +209,55 @@ class Solution:
             for i in range(m):
                 matrix[i][0] = 0
 
-    """
-简化 setZeroes_v3 中的代码结构;
-    """
-    def setZeroes_v4(self, matrix: List[List[int]]) -> None:
-        if not matrix:
-            return
-
-        m, n = len(matrix), len(matrix[0])
-        is_first_row_zero = True if 0 in matrix[0][:] else False
-        is_first_column_zero = True if 0 in matrix[:][0] else False
-
-        # jy: 找出需要置为 0 的行和列, 并将需要置为 0 的行或列的第一个元素置为 0;
-        for i in range(m):
-            for j in range(n):
-                if matrix[i][j] == 0:
-                    matrix[i][0] = 0
-                    matrix[0][j] = 0
-        # jy: 遍历矩阵, 如果相应位置的行或列的第一个元素为 0, 表明该位置需要置为 0;
-        for i in range(1, m):
-            for j in range(1, n):
-                if matrix[i][0] == 0 or matrix[0][j] == 0:
-                    matrix[i][j] = 0
-        # jy: 首行或首列置为 0
-        if is_first_row_zero:
-            matrix[0][:] = [0] * n    # jy: 只有行可以这么赋值;
-            #for i in range(n):
-            #    matrix[0][i] = 0
-        if is_first_column_zero:
-            #matrix[:][0] = [0] * m   # jy: 列不可以这么赋值, 因为其是列表搭建而成的(非真正矩阵类型)
-            print(matrix[:][0])
-            for i in range(m):
-                matrix[i][0] = 0
 
 
+matrix = [
+ [1, 1, 1],
+ [1, 0, 1],
+ [1, 1, 1]]
+Solution().setZeroes_v1(matrix)
+print("\n".join([" " + str(i) for i in matrix]))
+"""
+[[1, 0, 1],
+ [0, 0, 0],
+ [1, 0, 1]]
+"""
 
-matrix =\
-[ [1,1,1],
-  [1,0,1],
-  [1,1,1]]
-Output =\
-[ [1,0,1],
-  [0,0,0],
-  [1,0,1]]
-
-res = Solution().setZeroes_v3(matrix)
-print(" res: \n", np.array(matrix), "\n expected: \n", np.array(Output))
-
-print(" ======================= ")
-matrix =\
-[ [0,1,2,0],
-  [3,4,5,2],
-  [1,3,1,5]]
-Output =\
-[ [0,0,0,0],
-  [0,4,5,0],
-  [0,3,1,0]]
-
-res = Solution().setZeroes_v1(matrix)
-print(" res: \n", np.array(matrix), "\n expected: \n", np.array(Output))
-
-print(" ======================= ")
-matrix =\
-[ [0,1,2,0],
-  [3,4,5,2],
-  [1,3,1,5]]
-Output =\
-[ [0,0,0,0],
-  [0,4,5,0],
-  [0,3,1,0]]
-res = Solution().setZeroes_v2(matrix)
-print(" res: \n", np.array(matrix), "\n expected: \n", np.array(Output))
+matrix = [
+ [0, 1, 2, 0],
+ [3, 4, 5, 2],
+ [1, 3, 1, 5]]
+Solution().setZeroes_v2(matrix)
+print(matrix)
+"""
+[[0, 0, 0, 0],
+ [0, 4, 5, 0],
+ [0, 3, 1, 0]]
+"""
 
 
-print(" ======================= ")
-matrix =\
-[ [0,1,2,0],
-  [3,4,5,2],
-  [1,3,1,5]]
-Output =\
-[ [0,0,0,0],
-  [0,4,5,0],
-  [0,3,1,0]]
-res = Solution().setZeroes_v4(matrix)
-print(" res: \n", np.array(matrix), "\n expected: \n", np.array(Output))
+matrix = [
+ [0, 1, 2, 0],
+ [3, 4, 5, 2],
+ [1, 3, 1, 5]]
+Solution().setZeroes_v3(matrix)
+print(matrix)
+"""
+[[0, 0, 0, 0],
+ [0, 4, 5, 0],
+ [0, 3, 1, 0]]
+"""
 
+
+matrix = [
+ [0, 1, 2, 0],
+ [3, 4, 5, 2],
+ [1, 3, 1, 5]]
+Solution().setZeroes_v4(matrix)
+print(matrix)
+"""
+[[0, 0, 0, 0],
+ [0, 4, 5, 0],
+ [0, 3, 1, 0]]
+"""
 

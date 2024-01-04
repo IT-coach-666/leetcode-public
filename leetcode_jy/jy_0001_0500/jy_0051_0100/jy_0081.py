@@ -53,7 +53,6 @@ How and why?
 """
 
 
-from typing import List
 class Solution:
     """
 解法 1: 二分查找 (该题的任何解法同样可用于 0033 中)
