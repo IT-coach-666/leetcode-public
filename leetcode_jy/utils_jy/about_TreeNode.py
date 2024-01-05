@@ -64,45 +64,91 @@ def show_N_ary_tree(root):
     return ls_
    
 
-#【01】二叉树相关 =====================================
+#【01】二叉树相关 ============================================================
+# 01) 二叉树节点 ------------------------------------------------
 class TreeNode:
     """
-    def __init__(self, x):
-        self.val = x
-        self.left = None
-        self.right = None
+    二叉树节点类 (含各种属性)
     """
     def __init__(self, val=0, left=None, right=None,
-                 next=None):
+                 next=None, count=0, parent=None):
+        # jy: 二叉树节点必备属性
         self.val = val
         self.left = left
         self.right = right
 
-        self.next = next    #jy: 【0116】中需要
-        self.count = 0      #jy: 【0315】的解法 1 中需要
-        self.parent = None  #jy: 【0510】【1650】中需要
+        # jy: 二叉树节点的扩充属性
+        self.next = next      # jy: 【0116】中需要
+        self.count = count    # jy: 【0315】的解法 1 中需要
+        self.parent = parent  # jy: 【0510】【1650】中需要
 
 
-def pre_order(root: TreeNode) -> List[int]:
+# 02) 二叉树的构建 ----------------------------------------------
+def build_binary_tree(ls_: List):
+    """
+    基于二叉树列表存储方式, 还原二叉树
+
+    ls_: 二叉树的列表存储 (即将二叉树补齐为完全二叉树, 随后从上到下、从左
+         到右逐个元素记录到列表中); 满二叉树列表可以基于列表的下标位置定
+         位到相应节点的父节点, 因此可基于该特性对二叉树进行恢复
+
+    如以下二叉树存储为: [3, 9, 20, None, None, 15, 7]
+            3
+           / \
+          9  20
+            /  \
+           15   7
+    """
+    if len(ls_) == 0:
+        return None
+
+    # jy: 初始化树节点
+    ls_tree_node = [TreeNode(i) for i in ls_]
+    for i in range(len(ls_)):
+        # jy: 对应根节点, 无需操作
+        if i == 0:
+            continue
+        if ls_tree_node[i].val is not None:
+            # jy: 如果 i 为奇数, 表明对应的节点为左子节点
+            if i % 2 == 1:
+                parent_idx = (i - 1) // 2
+                ls_tree_node[parent_idx].left = ls_tree_node[i]
+
+                #jy: 考虑 parent 属性时的二叉树设置
+                ls_tree_node[i].parent = ls_tree_node[parent_idx]
+            # jy: 如果 i 为偶数, 表明对应的节点为右子节点
+            else:
+                parent_idx = (i - 2) // 2
+                ls_tree_node[parent_idx].right = ls_tree_node[i]
+
+                # jy: 考虑 parent 属性时的二叉树设置
+                ls_tree_node[i].parent = ls_tree_node[parent_idx]
+
+    # jy: 返回二叉树的根节点
+    return ls_tree_node[0]
+
+
+# 03) 二叉树的遍历 ----------------------------------------------
+def preorderTraversal(root: TreeNode) -> List[int]:
     """
     注意: 可变类型如 [] 不要作为函数参数默认值使用, 故递归调用存放
     入以下子函数(因为递归调用中需要传入列表参照); 也可以在主函数中
     传入列表参数, 但不能指定默认值为空列表, 因此每次调用都需要明确
     传递一个空列表
     """
-    def _pre_order(root: TreeNode, ls_) -> List[int]:
+    def pre_order(root: TreeNode, ls_) -> List[int]:
         if not root:
             return
         ls_.append(root.val)
-        _pre_order(root.left, ls_)
-        _pre_order(root.right, ls_)
+        pre_order(root.left, ls_)
+        pre_order(root.right, ls_)
 
     res = []
-    _pre_order(root, res)
+    pre_order(root, res)
     return res
 
 
-def pre_order2(root: TreeNode) -> List[int]:
+def preorderTraversal_v2(root: TreeNode) -> List[int]:
     """
     前序遍历的非递归写法(栈 + 循环)
     """
@@ -120,65 +166,96 @@ def pre_order2(root: TreeNode) -> List[int]:
     return res
 
 
-def in_order(root: TreeNode) -> List[int]:
+def inorderTraversal(root: TreeNode) -> List[int]:
     """
-    注意: 可变类型如 [] 不要作为函数参数默认值使用, 故递归调用存放
-    入以下子函数(因为递归调用中需要传入列表参照); 也可以在主函数中
-    传入列表参数, 但不能指定默认值为空列表, 因此每次调用都需要明确
-    传递一个空列表
+    中序遍历: 先遍历左子节点, 再遍历父节点, 最后遍历右子节点
     """
-    def _in_order(root: TreeNode, ls_) -> List[int]:
+    def in_order(root: TreeNode, ls_) -> List[int]:
         if not root:
-            return
-        _in_order(root.left, ls_)
+            return []
+        in_order(root.left, ls_)
         ls_.append(root.val)
-        _in_order(root.right, ls_)
+        in_order(root.right, ls_)
 
-    res = []
-    _in_order(root, res)
-    return res
+    ls_res = []
+    in_order(root, ls_res)
+    return ls_res
 
 
-def in_order2(root: TreeNode) -> List[int]:
+def inorderTraversal_v2(root: TreeNode) -> List[int]:
     """
-    中序遍历的非递归写法
+    中序遍历: 非递归写法 (栈 + 循环/迭代)
+
+    遍历完后不影响树的根节点
+
+    思路: 维护一个栈, 只要当前结点不为空, 则不断入栈, 并更新当前节点为左
+    子结点, 直到没有左子结点为止, 则出栈一个结点, 将节点值记录列表中, 然
+    后将当前节点更新为出栈结点的右子结点, 随后不断重复原先的左子节点操作
     """
-    res = []
     if not root:
-        return res
+        return []
 
+    ls_res = []
     stack = []
-    while stack or root:
-        if root:
-            stack.append(root)
-            root = root.left
+    # jy: 遍历完后不影响树的根节点
+    current = root
+    # jy: 当没有节点、且栈为空时才退出循环
+    while stack or current:
+        if current:
+            stack.append(current)
+            current = current.left
         else:
-            root = stack.pop()
-            res.append(root.val)
-            root = root.right
-    return res
+            current = stack.pop()
+            ls_res.append(current.val)
+            current = current.right
+    return ls_res
 
 
-def post_order(root: TreeNode) -> List[int]:
+def inorderTraversal_v3(root: TreeNode) -> List[int]:
+    """
+    中序遍历: 非递归写法的改写 (栈 + 循环/迭代)
+    """
+    if not root:
+        return []
+
+    ls_res = []
+    stack = []
+    # jy: 遍历完后不影响树的根节点
+    current = root
+    # jy: 当没有节点、且栈为空时才退出循环
+    while stack or current:
+        
+        while current:
+            stack.append(current)
+            current = current.left
+
+        current = stack.pop()
+        ls_res.append(current.val)
+        current = current.right
+    return ls_res
+
+
+
+def postorderTraversal(root: TreeNode) -> List[int]:
     """
     注意: 可变类型如 [] 不要作为函数参数默认值使用, 故递归调用存
     放入以下子函数(因为递归调用中需要传入列表参照); 也可以在主函数
     中传入列表参数, 但不能指定默认值为空列表, 因此每次调用都需要明
     确传递一个空列表
     """
-    def _post_order(root: TreeNode, ls_) -> List[int]:
+    def post_order(root: TreeNode, ls_) -> List[int]:
         if not root:
             return
-        _post_order(root.left, ls_)
-        _post_order(root.right, ls_)
+        post_order(root.left, ls_)
+        post_order(root.right, ls_)
         ls_.append(root.val)
 
     res = []
-    _post_order(root, res)
+    post_order(root, res)
     return res
 
 
-def post_order2(root: TreeNode) -> List[int]:
+def postorderTraversal_v2(root: TreeNode) -> List[int]:
     """
     后续遍历的非递归写法
     """
@@ -218,38 +295,7 @@ def post_order2(root: TreeNode) -> List[int]:
     # jy-version-2-End ----------------------------------
     return res
 
-
-
-def build_binary_tree(ls_: List):
-    """
-依据二叉树的列表存储方式, 还原二叉树, 如:
-Given binary tree [3, 9, 20, None, None, 15, 7],
-    3
-   / \
-  9  20
-    /  \
-   15   7    
-    """
-    if len(ls_) == 0:
-        return None
-
-    ls_tree_node = [TreeNode(i) for i in ls_]
-    for i in range(len(ls_)):
-        if i == 0:
-            continue
-        if ls_tree_node[i].val is not None:
-            if i % 2 == 1:
-                ls_tree_node[(i-1)//2].left = ls_tree_node[i]
-
-                #jy: 构建树时也构建其 parent 属性值;
-                ls_tree_node[i].parent = ls_tree_node[(i-1)//2]
-            else:
-                ls_tree_node[(i-2)//2].right = ls_tree_node[i]
-                # jy: 构建树时也构建其 parent 属性值;
-                ls_tree_node[i].parent = ls_tree_node[(i-2)//2]
-         
-    return ls_tree_node[0]
-
+# 04) 二叉树的序列化存储 ----------------------------------------
 
 def serialize(root):
     if not root:
@@ -279,12 +325,12 @@ if __name__ == "__main__":
     ls_ = [3, 9, 20, None, None, 15, 7]
     # ls_ = [1, None, 2, None, None, 3]
     root = build_binary_tree(ls_)
-    print("pre_order: ", pre_order(root))
-    print("pre_order2: ", pre_order2(root))
-    print("in_order: ", in_order(root))
-    print("in_order2: ", in_order2(root))
-    print("post_order: ", post_order(root))
-    print("post_order2: ", post_order2(root))
+    print("preorderTraversal: ", preorderTraversal(root))
+    print("preorderTraversal_v2: ", preorderTraversal_v2(root))
+    print("inorderTraversal: ", inorderTraversal(root))
+    print("inorderTraversal_v2: ", inorderTraversal_v2(root))
+    print("postorderTraversal: ", postorderTraversal(root))
+    print("postorderTraversal_v2: ", postorderTraversal_v2(root))
 
     #ls_N_ary = [1, [3, [5, 6], 2, 4]]
     ls_N_ary = [1, [2, 3, [6, 7, [11, [14]]], 4, [8, [12]], 5, [9, [13], 10]]]
