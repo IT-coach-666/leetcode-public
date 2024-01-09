@@ -137,11 +137,11 @@ class Solution:
 
 该题的难点是找到那两个交换节点, 把它交换过来
 
-二叉树搜索树中序遍历的结果是递增的, 如果中序遍历顺序是 [4, 2, 3, 1], 只要找
-到节点 4 和节点 1 交换顺序即可; 有个规律发现这两个节点:
-1) 第一个节点是第一个按照中序遍历时前一个节点大于后一个节点时, 取前一个节点
+二叉树搜索树中序遍历的结果是递增的, 如果中序遍历顺序是 [4, 2, 3, 1], 只要
+找到节点 4 和节点 1 交换顺序即可; 可基于以下规律找这两个节点:
+1) 第一个节点是第一个按中序遍历时, 前一个节点大于后一个节点时的前一个节点
    (此处指节点 4)
-2) 第二个节点是在第一个节点找到之后, 后面出现前一个节点大于后一个节点时, 取
+2) 第二个节点是在第一个节点找到之后, 后面出现前一个节点大于后一个节点时的
    后一个节点 (此处指节点 1)
     """
     def recoverTree_v3(self, root: TreeNode) -> None:
@@ -153,26 +153,33 @@ class Solution:
         pre = TreeNode(float("-inf"))
 
         stack = []
-        p = root
-        while p or stack:
-            while p:
-                stack.append(p)
-                p = p.left
-            p = stack.pop()
-            
-            if not firstNode and pre.val > p.val:
-                    firstNode = pre
-            if firstNode and pre.val > p.val:
-                #print(firstNode.val,pre.val, p.val)
-                secondNode = p
-            pre = p
-            p = p.right
+        current = root
+        while current or stack:
+            while current:
+                stack.append(current)
+                current = current.left
+
+            # jy: 该出栈的节点值在中序遍历过程中本应该加入到结果列表,
+            #     以下是基于该值与上一个节点值判断是否是错放位置的节点
+            current = stack.pop()
+          
+            # jy: 如果上一个节点值大于当前节点值, 则表明上一个节点为
+            #     第一个放错位置的节点  
+            if not firstNode and pre.val > current.val:
+                firstNode = pre
+
+            # jy: 如果第一个放错位置的节点已经找到了, 则第二个错放位置
+            #     的节点为下一个比前一个节点小的节点
+            if firstNode and pre.val > current.val:
+                secondNode = current
+            pre = current
+
+            current = current.right
         firstNode.val, secondNode.val = secondNode.val, firstNode.val
 
 
     """
-解法 4: 
-
+解法 4: 解法 3 的递归实现方式
     """
     def recoverTree_v4(self, root: TreeNode) -> None:
         """
@@ -185,15 +192,20 @@ class Solution:
         def in_order(root):
             if not root:
                 return
+
             in_order(root.left)
+
+            # jy: 中序遍历中当前的 root.val 本应加入结果列表
             if self.firstNode == None and self.preNode.val >= root.val:
                 self.firstNode = self.preNode
             if self.firstNode and self.preNode.val >= root.val:
                 self.secondNode = root
             self.preNode = root
+
             in_order(root.right)
 
         in_order(root)
+        # jy: 交换两个错位的节点
         self.firstNode.val, self.secondNode.val = self.secondNode.val, self.firstNode.val
 
 
@@ -201,7 +213,7 @@ class Solution:
 ls_ = [1, 3, None, None, 2]
 root = build_binary_tree(ls_)
 print("before=============: ", serialize(root))
-# Output: [3,1,null,null,2]
+# Output: [3, 1, null, null, 2]
 Solution().recoverTree_v1(root)
 print(serialize(root))
 
@@ -209,7 +221,7 @@ print(serialize(root))
 ls_ = [3, 1, 4, None, None, 2]
 root = build_binary_tree(ls_)
 print("before=============: ", serialize(root))
-# Output: [2,1,4,null,null,3]
+# Output: [2, 1, 4, null, null, 3]
 Solution().recoverTree_v2(root)
 print(serialize(root))
 

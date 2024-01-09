@@ -152,39 +152,45 @@ def build_binary_tree(ls_: List):
 # 03) 二叉树的遍历 ----------------------------------------------
 def preorderTraversal(root: TreeNode) -> List[int]:
     """
-    注意: 可变类型如 [] 不要作为函数参数默认值使用, 故递归调用存放
-    入以下子函数(因为递归调用中需要传入列表参照); 也可以在主函数中
-    传入列表参数, 但不能指定默认值为空列表, 因此每次调用都需要明确
-    传递一个空列表
+    前序遍历: 递归
+
+    前序遍历: 先遍历当前节点, 再遍历左子树, 最后遍历右子树
     """
     def pre_order(root: TreeNode, ls_) -> List[int]:
         if not root:
             return
+        # jy: 先遍历当前节点, 再遍历左子树, 最后遍历右子树
         ls_.append(root.val)
         pre_order(root.left, ls_)
         pre_order(root.right, ls_)
 
-    res = []
-    pre_order(root, res)
-    return res
+    ls_res = []
+    pre_order(root, ls_res)
+    return ls_res
 
 
 def preorderTraversal_v2(root: TreeNode) -> List[int]:
     """
-    前序遍历的非递归写法(栈 + 循环)
+    前序遍历: (栈 + 循环)
     """
-    res = []
+    ls_res = []
     if not root:
-        return res
+        return ls_res
+
+    # jy: 先将根节点入栈, 随后不断出栈树节点元素, 将元素值存放
+    #     到结果列表; 接着先判断树节点元素是否有右子节点, 如果
+    #     存在右子节点, 则将右子节点入栈, 再判断是否有左子节点,
+    #     如果有, 则将左子节点入栈 (因为栈是后进先出, 左子节点
+    #     后入栈, 后续出栈时才能确保左子节点比右子节点先遍历到)
     stack = [root]
     while stack:
         root = stack.pop()
-        res.append(root.val)
+        ls_res.append(root.val)
         if root.right:
             stack.append(root.right)
         if root.left:
             stack.append(root.left)
-    return res
+    return ls_res
 
 
 def inorderTraversal(root: TreeNode) -> List[int]:
@@ -259,10 +265,9 @@ def inorderTraversal_v3(root: TreeNode) -> List[int]:
 
 def postorderTraversal(root: TreeNode) -> List[int]:
     """
-    注意: 可变类型如 [] 不要作为函数参数默认值使用, 故递归调用存
-    放入以下子函数(因为递归调用中需要传入列表参照); 也可以在主函数
-    中传入列表参数, 但不能指定默认值为空列表, 因此每次调用都需要明
-    确传递一个空列表
+    后序遍历: 递归
+
+    后序遍历: 先遍历左子树, 再遍历右子树, 最后遍历当前节点
     """
     def post_order(root: TreeNode, ls_) -> List[int]:
         if not root:
@@ -271,50 +276,92 @@ def postorderTraversal(root: TreeNode) -> List[int]:
         post_order(root.right, ls_)
         ls_.append(root.val)
 
-    res = []
-    post_order(root, res)
-    return res
+    ls_res = []
+    post_order(root, ls_res)
+    return ls_res
 
 
 def postorderTraversal_v2(root: TreeNode) -> List[int]:
     """
-    后续遍历的非递归写法
+    后续遍历: 栈 + 循环
+
+    基于以下二叉树进行思考:
+            3
+           / \
+          9  20
+            /  \
+           15   7
+    后续遍历结果为: [9, 15, 7, 20, 3]
     """
-    res = []
+    ls_res = []
     if not root:
-        return res
-    # jy-version-1-Begin --------------------------------
-    stack1 = []
-    # jy: stack2 用于保存 stack1 中出栈时的元素, 因为 stack1 出
-    #     栈的顺序会构造成后序遍历的逆序, 将其入栈 stack2 后, 最
-    #     后 stack2 不断出栈即为真正的后序遍历结果
-    stack2 = []
-    stack1.append(root)
-    while stack1:
-        root = stack1.pop()
-        stack2.append(root)
+        return ls_res
+
+    # jy: stack 出栈的顺序即后序遍历的逆序
+    stack = []
+
+    # jy: 先将根节点入栈, 随后不断循环出栈, 并将出栈节点值加入
+    #     结果列表 ls_res, 同时如果出栈节点存在左子节点, 则先将
+    #     左子节点入栈, 如果存在右子节点, 则将右子节点入栈; 因
+    #     此后续不断出栈的元素总是优先将树的下一层右子节点出栈,
+    #     其次是下一层的左子节点, 使得最终出栈结果为后续遍历的
+    #     逆序顺序
+    stack.append(root)
+    while stack:
+        root = stack.pop()
+        ls_res.append(root.val)
+
         if root.left:
-            stack1.append(root.left)
+            stack.append(root.left)
         if root.right:
-            stack1.append(root.right)
-    while stack2:
-        res.append(stack2.pop().val)
-    # jy-version-1-End ---------------------------------
-    # jy-version-2-Begin -------------------------------
-    '''
+            stack.append(root.right)
+
+    ls_res = ls_res[::-1]
+    return ls_res
+
+
+def postorderTraversal_v3(root: TreeNode) -> List[int]:
+    """
+    后续遍历: 栈 + 循环 (出栈结果无需倒序); 该方法逻辑较难梳理
+
+    基于以下二叉树进行思考:
+            3
+           / \
+          9  20
+            /  \
+           15   7
+    后续遍历结果为: [9, 15, 7, 20, 3]
+    """
+    ls_res = []
+    if not root:
+        return ls_res
+
     stack = [root]
     while stack:
-        c = stack[-1]
-        if c.left and root != c.left and root != c.right:
-            stack.append(c.left)
-        elif c.right and root != c.right:
-            stack.append(c.right)
+        # jy: 当前节点总是为栈顶节点 (并不出栈)
+        cur = stack[-1]
+
+        # jy: 如果当前节点存在左子节点, 且 root 不是当前节点的左/右
+        #     子节点, 则将当前节点的左子节点入栈 (root 后续会被更新
+        #     为最新出栈的节点, 如果当前节点的左/右子节点为 root 节
+        #     点, 表明左/右子节点已经遍历过, 不能再将其加入栈中, 防
+        #     止重复遍历)
+        if cur.left and root != cur.left and root != cur.right:
+            stack.append(cur.left)
+        # jy: 如果当前节点存在右子节点, 且 root 不是当前节点的右子节
+        #     点, 则将当前节点的右子节点入栈 (root 含义参见以上说明)
+        elif cur.right and root != cur.right:
+            stack.append(cur.right)
+        # jy: 如果当前节点没有左右子节点, 或当前节点的左右子节点均已
+        #     经被遍历过 (即 root 节点为当前节点的左/右子节点), 则将
+        #     当前节点出栈, 并将该节点作为新的 root (代表已经遍历过)
         else:
-            res.append(stack.pop().val)
-            root = c
-    '''
-    # jy-version-2-End ----------------------------------
-    return res
+            # jy: root 每次均更新为最新出栈的节点
+            ls_res.append(stack.pop().val)
+            root = cur
+
+    return ls_res
+
 
 
 # 04) 二叉树的序列化存储 ----------------------------------------
@@ -368,6 +415,7 @@ if __name__ == "__main__":
     print("inorderTraversal_v2: ", inorderTraversal_v2(root))
     print("postorderTraversal: ", postorderTraversal(root))
     print("postorderTraversal_v2: ", postorderTraversal_v2(root))
+    print("postorderTraversal_v3: ", postorderTraversal_v3(root))
 
     # jy: 二叉树的序列化存储 ------------------------------------
     ls_res = serialize(root)
@@ -380,6 +428,5 @@ if __name__ == "__main__":
     root = build_N_ary_tree(ls_N_ary)
     # jy: N 叉树的序列化过程 ------------------------------------
     print(show_N_ary_tree(root))
-
 
 
