@@ -2,63 +2,84 @@ from typing import List
 from collections import deque
 
 
-#【01】N 叉树相关 ====================================
+#【01】N 叉树相关 ============================================================
 class Node(object):
+    """
+    N 叉树的节点
+    """
     def __init__(self, val=None, children=None):
         if children is None:
             children = []
 
-        #jy: 当前节点值;
+        #jy: 当前节点值
         self.val = val
-        #jy: 当前节点的下一层子节点(N 叉树, 最多能有 N 个节点)
+        #jy: 当前节点的下一层子节点 (N 叉树最多有 N 个节点)
         self.children = children
 
 
 def build_N_ary_tree(ls_N_ary):
     """
-    N 叉树的节点关联关系通过类似 [1, [3, [5, 6], 2, 4]] 列表表示:
-    节点 1 共有 [3, 2, 4] 三个子节点, 而节点 3 共有 [5, 6] 两个
-    子节点    
+    基于 N 叉树的序列化结果列表, 反序列化为 N 叉树
+
+    [1, [3, [5, 6], 2, 4]] 表示的 N 叉树:
+    节点 1 共有 [3, 2, 4] 三个子节点, 而节点 3 共有 [5, 6] 两个子节点
+
+    序列化结果列表中, 有几个中括号嵌套就表示树有几层
     """
     #ls_N_ary = [1, [3, [5, 6], 2, 4]]
 
     def build_children(root, ls_N_ary):
+        """
+        root: 当前 N 叉树的根节点
+        ls_N_ary: N 叉树根节点下面的子节点列表
+        """
         for i in ls_N_ary:
+            # jy: 如果列表中的元素是整数值, 表明该整数值的节点
+            #     为根节点的子节点
             if isinstance(i, int):
+                # jy: 构建 N 叉树的节点
                 node = Node(i)
                 root.children.append(node)
-                #print("root_.children====: ", [j.val for j in root_.children], 
-                #      "int---i: ", i)
+            # jy: 如果列表中的元素是列表类型, 表明该元素是前一个
+            #     节点 node 下面的子节点, 递归构建该子 N 叉树`
             elif isinstance(i, list):
                 build_children(node, i)
             
+    # jy: 构建 N 叉树的根节点
     root = Node(ls_N_ary[0])
+    # jy: 递归构建 N 叉树
     build_children(root, ls_N_ary[1])
-    #print("====root: ", root, "====root.children", [j.val for j in root.children])
- 
+    # jy: 返回 N 叉树的根节点
     return root
 
 
 def show_N_ary_tree(root):
     """
-    将 N 叉树转换为类似 [1, [3, [5, 6], 2, 4]] 列表表示:
-    节点 1 共有 [3, 2, 4] 三个子节点, 而节点 3 共有 [5, 6] 两
-    个子节点
+    将 N 叉树进行序列化, 转换为列表存储
 
-    即构造二叉树的逆过程, 可视为反序列化过程
+    如 N 叉树的节点 1 共有 [3, 2, 4] 三个子节点, 而节点 3 共有 [5, 6] 两
+    个子节点, 则该 N 叉树对应的列表为: [1, [3, [5, 6], 2, 4]]
     """
     if root.val is None:
-        return
+        return []
 
     def get_children(root):
+        """
+        传入 N 叉树的根节点, 返回根节点对应的子节点列表
+        """
         ls_tmp = []
+        # jy: 遍历根节点的子节点列表 (即 children 属性)
         for child in root.children:
+            # jy: 将子节点的值放入列表, 如果该子节点存在下一层子节点,
+            #     则递归获取下一层子节点的列表, 并存入到当前列表中
             ls_tmp.append(child.val)
             if child.children:
                 ls_tmp.append(get_children(child))
         return ls_tmp
 
+    # jy: 将根节点的值放入结果列表
     ls_ = [root.val]
+    # jy: 获取根节点对应的子节点列表
     ls_.append(get_children(root))
 
     return ls_
@@ -295,13 +316,22 @@ def postorderTraversal_v2(root: TreeNode) -> List[int]:
     # jy-version-2-End ----------------------------------
     return res
 
-# 04) 二叉树的序列化存储 ----------------------------------------
 
+# 04) 二叉树的序列化存储 ----------------------------------------
 def serialize(root):
+    """
+    广度优先遍历 (BFS) 序列化树节点值
+    """
     if not root:
         return ""
+
     ls_res = []
+    # jy: 将根节点放入双端队列
     deque_ = deque([root])
+    # jy: 如果队列不为空, 且队列中至少有一个有效树节点, 表明当前队
+    #     列中的元素为树结构中的同一层, 统计该层的节点数后不断左侧
+    #     出队并添加到结果列表里, 同时将相应节点的左右子节点右侧入
+    #     队, 如果相应节点为 None, 其对应的左右子节点也均对应为 None
     while deque_ and deque_.count(None) != len(deque_):
         size_ = len(deque_)
         for i in range(size_):
@@ -314,17 +344,24 @@ def serialize(root):
                 deque_.append(None)
                 deque_.append(None)
 
+    # jy: 去除结果列表中最右侧的 None (构造完全二叉树即可, 不需为满
+    #     二叉树)
     while ls_res[-1] is None:
         ls_res.pop()
 
-    return str(ls_res)
+    #return str(ls_res)
+    return ls_res
 
 
 
 if __name__ == "__main__":
+    # jy: 二叉树 ================================================
     ls_ = [3, 9, 20, None, None, 15, 7]
     # ls_ = [1, None, 2, None, None, 3]
+    # jy: 构建二叉树 --------------------------------------------
     root = build_binary_tree(ls_)
+
+    # jy: 二叉树遍历 --------------------------------------------
     print("preorderTraversal: ", preorderTraversal(root))
     print("preorderTraversal_v2: ", preorderTraversal_v2(root))
     print("inorderTraversal: ", inorderTraversal(root))
@@ -332,8 +369,17 @@ if __name__ == "__main__":
     print("postorderTraversal: ", postorderTraversal(root))
     print("postorderTraversal_v2: ", postorderTraversal_v2(root))
 
+    # jy: 二叉树的序列化存储 ------------------------------------
+    ls_res = serialize(root)
+    print(ls_res)
+
+    # jy: N 叉树 ================================================
     #ls_N_ary = [1, [3, [5, 6], 2, 4]]
     ls_N_ary = [1, [2, 3, [6, 7, [11, [14]]], 4, [8, [12]], 5, [9, [13], 10]]]
+    # jy: 构建 N 叉树 -------------------------------------------
     root = build_N_ary_tree(ls_N_ary)
+    # jy: N 叉树的序列化过程 ------------------------------------
     print(show_N_ary_tree(root))
+
+
 
