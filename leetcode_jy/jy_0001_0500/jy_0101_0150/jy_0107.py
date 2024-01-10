@@ -14,17 +14,23 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Binary-Tree-Level-Order-Traversal-II(tree)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "递归 | 循环/迭代 | 相似题: 0102 | IMP"
 
 
 """
-Given the root of a binary tree, return the bottom-up level order traversal of its
-nodes' values. (i.e., from left to right, level by level from leaf to root).
+Given the `root` of a binary tree, return the bottom-up level order traversal
+of its nodes' values. (i.e., from left to right, level by level from leaf to
+root).
 
 
-Example 1:   https://www.yuque.com/frederick/dtwi9g/agadog
-Input: root = [3,9,20,null,null,15,7]
-Output: [[15,7],[9,20],[3]]
+Example 1:
+    3
+   / \
+  9  20
+    /  \
+   15   7
+Input: root = [3, 9, 20, null, null, 15, 7]
+Output: [[15, 7], [9, 20], [3]]
 
 Example 2:
 Input: root = [1]
@@ -36,40 +42,30 @@ Output: []
 
 
 Constraints:
-The number of nodes in the tree is in the range [0, 2000].
--1000 <= Node.val <= 1000
+1) The number of nodes in the tree is in the range [0, 2000].
+2) -1000 <= Node.val <= 1000
 """
 
 
 from collections import deque
-from typing import List
-from about_TreeNode import *
+from leetcode_jy.utils_jy.about_TreeNode import TreeNode, build_binary_tree
+from leetcode_jy.utils_jy.about_TreeNode import levelorderTraversal
 
 
 class Solution:
     """
-解法1: 同 102_Binary-Tree-Level-Order-Traversal.py 的解法 3, 只是最后将结果倒序
+解法 1: 循环/迭代
+
+同 0102 (Binary-Tree-Level-Order-Traversal) 的解法 1, 但最后将结果倒序
     """
     def levelOrderBottom_v1(self, root: TreeNode) -> List[List[int]]:
-        queue = deque([root]) if root else deque()
-        levels = []
+        ls_level = levelorderTraversal(root)
+        return ls_level[::-1]
 
-        while queue:
-            level = []
-            for _ in range(len(queue)):
-                node = queue.popleft()
-                level.append(node.val)
-
-                if node.left:
-                    queue.append(node.left)
-                if node.right:
-                    queue.append(node.right)
-            levels.append(level)
-        return list(reversed(levels))
 
     """
-解法2: 同 102_Binary-Tree-Level-Order-Traversal.py 的解法2, 不同的是往最终结果插入
-数组时从数组头插入, 因为层序遍历从下往上
+解法 2: 参考 0102 (Binary-Tree-Level-Order-Traversal) 的解法 2, 但最终
+结果插入数组时从数组头插入 (左侧插入), 使得第一层遍历存放在结果列表末尾
     """
     def levelOrderBottom_v2(self, root: TreeNode) -> List[List[int]]:
         queue = deque()
@@ -85,18 +81,22 @@ class Solution:
         #     级是最小的;
         if level > len(queue):
             queue.appendleft([])
-        # jy: 往指定的层级中加入元素,
+        # jy: 往指定的层级中加入元素
         queue[-level].append(root.val)
 
         self._dfs(root.left, level + 1, queue)
         self._dfs(root.right, level + 1, queue)
 
+
     """
-JY: 同解法1, 但使用了双向队列存储最终结果, 减少一次倒序排序;
+解法 3: 参考解法 1 和解法 2
+
+使用双向队列存储每一层的遍历结果, 每一层遍历结果从左侧插入
     """
-    def levelOrderBottom_jy(self, root: TreeNode) -> List[List[int]]:
+    def levelOrderBottom_v3(self, root: TreeNode) -> List[List[int]]:
         res = deque()
-        # jy: 当 root 为 None 时, 不能加入队列中, 否则后续出队为 None, 没有 val 属性, 会报错;
+        # jy: 当 root 为 None 时, 不能加入队列中, 否则后续出队为 None,
+        #     没有 val 属性, 会报错
         deque_ = deque([root]) if root else deque()
         while deque_:
             current_level = []
@@ -113,21 +113,23 @@ JY: 同解法1, 但使用了双向队列存储最终结果, 减少一次倒序�
 
 
 ls_ = [3, 9, 20, None, None, 15, 7]
-# Output: [[15,7],[9,20],[3]]
 root = build_binary_tree(ls_)
 res = Solution().levelOrderBottom_v1(root)
+# jy: [[15, 7], [9, 20], [3]]
 print(res)
+
 
 ls_ = [1]
-# Output: [[1]]
 root = build_binary_tree(ls_)
 res = Solution().levelOrderBottom_v2(root)
+# jy: [[1]]
 print(res)
 
+
 ls_ = []
-# Output: []
 root = build_binary_tree(ls_)
-res = Solution().levelOrderBottom_jy(root)
+res = Solution().levelOrderBottom_v3(root)
+# jy: []
 print(res)
 
 

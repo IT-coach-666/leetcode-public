@@ -363,6 +363,65 @@ def postorderTraversal_v3(root: TreeNode) -> List[int]:
     return ls_res
 
 
+def levelorderTraversal(root: TreeNode) -> List[List[int]]:
+    """
+    循环 + 队列 (先进先出)
+
+    初始化时先将根节点入队, 随后遍历队列时, 先记录当前队列的长度 n,
+    然后执行 n 次出队操作, 则这 n 次出队的结点都是同一层的结点
+    """
+    queue = deque([root]) if root else deque()
+    ls_level = []
+    while queue:
+        ls_level_i = []
+        # jy: 第一轮遍历时, 根节点一层只有一个元素, 循环一次: 出队一
+        #     个元素, 并将其左右子节点入队 (入队过程中不会影响当前的
+        #     len(queue), 需等原先 for 循环结束后该值再做更新; 但为了
+        #     避免误解, 可将 len(queue) 放在 for 循环之前); 经过一轮
+        #     循环后, queue 的长度即下一层元素的个数
+        for _ in range(len(queue)):
+            node = queue.popleft()
+            ls_level_i.append(node.val)
+            if node.left:
+                queue.append(node.left)
+            if node.right:
+                queue.append(node.right)
+        ls_level.append(ls_level_i)
+    return ls_level
+
+
+def levelorderTraversal_v2(root: TreeNode) -> List[List[int]]:
+    """
+    递归 (深度优先搜索)
+
+    深度优先搜索时记录当前的层数, 如果 ls_level 的长度小于当前层数, 说明
+    当前节点属于新的一层, 则在 ls_level 中加入一个新数组, 接着将结点的值
+    加入到对应层的 ls_level 数组中
+    """
+    def _dfs(root: TreeNode, level: int, ls_level: List[List[int]]) -> None:
+        """
+        当前树节点 root 属于第 level 层; ls_level 用于存放所有层结果
+        """
+        # jy: 如果 root 不存在, 则 return 终止
+        if not root:
+            return
+        # jy: 如果 level 大于 ls_level 的长度, 表明第 level 层还不存在
+        #     于 ls_level 中, 应往 ls_level 中加入新层 [], 用以存放当
+        #     前 root 元素
+        if level > len(ls_level):
+            ls_level.append([])
+
+        # jy: 将 root 加入 ls_level 的第 n 层中 (对应的下标为 n-1)
+        ls_level[level - 1].append(root.val)
+        _dfs(root.left, level + 1, ls_level)
+        _dfs(root.right, level + 1, ls_level)
+
+    ls_level = []
+    # jy: 先将 root 节点加入第 1 层 (如果 root 为空, 则 _dfs 会直接返回,
+    #     不会在 ls_level 中加入数值)
+    _dfs(root, 1, ls_level)
+    return ls_level
+
 
 # 04) 二叉树的序列化存储 ----------------------------------------
 def serialize(root):
@@ -370,7 +429,7 @@ def serialize(root):
     广度优先遍历 (BFS) 序列化树节点值
     """
     if not root:
-        return ""
+        return []
 
     ls_res = []
     # jy: 将根节点放入双端队列
