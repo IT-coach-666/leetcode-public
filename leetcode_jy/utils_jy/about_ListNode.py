@@ -52,8 +52,7 @@ def getLen(ln_):
 
 def showLnValue(head_, ln_name="ListNode"):
     """
-    展示 ListNode 对象中的值 (不改变原有对象, 遍历后不将原有对象置
-    于链尾)
+    展示 ListNode 对象中的值 (不改变原有对象, 遍历后不将原有对象置于链尾)
     """
     tmp_ln = head_
     str_ = ""

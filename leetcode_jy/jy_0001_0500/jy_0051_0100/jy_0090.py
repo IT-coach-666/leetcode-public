@@ -14,7 +14,7 @@ type_jy = "M"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "subsets-ii(array_dim_1)"
 # jy: 记录不同解法思路的关键词
-tag_jy = "UNDO 子集问题 | 相似题: 参考 permutation_combination_subset"
+tag_jy = "子集问题 | 相似题: 参考 permutation_combination_subset"
 
 
 """
@@ -24,67 +24,93 @@ Return the solution in any order.
 
 
 Example 1:
-Input: nums = [1,2,2]
-Output: [[],[1],[1,2],[1,2,2],[2],[2,2]]
+Input: nums = [1, 2, 2]
+Output: [[], [1], [1, 2], [1, 2, 2], [2], [2, 2]]
 
 Example 2:
 Input: nums = [0]
-Output: [[],[0]]
+Output: [[], [0]]
  
 
 Constraints:
-1 <= nums.length <= 10
--10 <= nums[i] <= 10
+1) 1 <= nums.length <= 10
+2) -10 <= nums[i] <= 10
 """
 
 
 
 class Solution(object):
-    def subsetsWithDup(self, nums):
+    """
+解法 1: 递归
+    """
+    def subsetsWithDup_v1(self, nums):
         if not nums:
             return []
-        n = len(nums)
-        res = []
-        nums.sort()
-	# 思路1
-        def helper1(idx, n, temp_list):
-            if temp_list not in res:
-                res.append(temp_list)
+
+        def helper1(nums, idx, n, combination, ls_res):
+            """
+            尝试将 nums[idx: n] 中的元素逐个放入组合 combination 中, 并将
+            不同的组合放入结果列表 ls_res
+
+            递归函数中的参数 n 其实可以省略, 递归过程中用 len(nums[idx:]) 替
+            代, 但这样会导致频繁计算 nums 子集的长度
+            """
+            # jy: 通过判断组合 (组合中的元素有序) 是否在结果列表中实现去重
+            if combination not in ls_res:
+                ls_res.append(combination)
             for i in range(idx, n):
-                helper1(i + 1, n, temp_list + [nums[i]])
-	# 思路2
-        def helper2(idx, n, temp_list):
-            res.append(temp_list)
+                # jy: 将当前元素 nums[i] 加入组合中, 随后从下一个位置开始不断
+                #     将元素加入组合
+                helper1(nums, i+1, n, combination + [nums[i]], ls_res)
+
+        def helper2(nums, idx, n, combination, ls_res):
+            # jy: 直接将组合加入结果列表, 通过 for 循环中的 if 判断实现去重
+            ls_res.append(combination)
             for i in range(idx, n):
-                if i > idx and  nums[i] == nums[i - 1]:
+                # jy: 以 nums = [1, 2, 2] 为例, 为了区别两个不同位置的 2, 写作
+                #     nums = [1, 2, 2'], 如果上一轮递归中 combination 为 [1], 
+                #     且在下一层更深的递归中传入的 idx 为 1, 即从第一个数值 2 
+                #     开始, 当前同层级的 for 循环会遍历两个 2, 如果不加一下的
+                #     if 判断逻辑, 则同层级的 for 循环执行完后, 调用下一更深层
+                #     级的递归时会将 [1, 2] 和 [1, 2'] 都加入到结果列表, 导致
+                #     子集重复; 所以在同层级的递归过程中, 如果当前元素的值与前
+                #     一个位置 (需确认前一个位置的元素存在) 的元素值相同, 则应
+                #     跳过该元素, 即可达到去重效果 (该判断需要在 nums 已经排序
+                #     的情况下进行, 否则判断无效)
+                if i > idx and  nums[i] == nums[i-1]:
                     continue
-                helper2(i + 1, n, temp_list + [nums[i]])
+                helper2(nums, i+1, n, combination + [nums[i]], ls_res)
 
-        helper2(0, n, [])
-        return res
-
-
-    """
-给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
-以 nums = [1,2,2] 为例，为了区别两个 2 是不同元素，写作 nums = [1,2,2']。显然，两条值相同的相邻树枝会产生重复，如都有2：[1,2]，[1,2']，所以需要进行剪枝，如果一个节点有多条值相同的树枝相邻，则只遍历第一条，剩下的都剪掉，不要去遍历：遍历了[1,2]就不再遍历[1,2']。
-在代码实现上，先对nums进行排序，在遍历时如果当前元素nums[i]与前一个元素相等nums[i] == nums[i-1]则跳过该元素（注意越界问题）：
-    """
-    def subsetsWithDup(self, nums: List[int]) -> List[List[int]]:
-        res, track = list(), list()
+        n = len(nums)
+        ls_res = []
+        # jy: 先对数组进行排序, 使得后续的子集都有序, 方便判断是否重合
         nums.sort()
-        def backtrack(nums,start):
-            # 子集问题 不需要判断结束条件 而是要把所有的track都加入res
-            res.append(track[:])
-            # 对于所有选择
-            for i in range(start,len(nums)):
-                # 先判断是否满足条件 如果与上一个重复就跳过 此时i > start比避免越界
+        #helper1(nums, 0, n, [], ls_res)
+        helper2(nums, 0, n, [], ls_res)
+        return ls_res
+
+
+    """
+解法 2: 递归 (解法 1 中 helper2 的另一种实现)
+
+该方式与解法 1 中的区别是: 解法 1 中对 combination 的操作是直接在传参时操
+作, 而当前解法中的 combination 会单独拎出来作为一个全局变量操作, 使得递归
+过程中对该变量的操作会影响到后续递归过程, 因此递归过程中需要回溯处理
+    """
+    def subsetsWithDup_v2(self, nums: List[int]) -> List[List[int]]:
+        ls_res = []
+        combination = []
+        nums.sort()
+        def backtrack(nums, start):
+            ls_res.append(combination[:])
+            for i in range(start, len(nums)):
                 if i > start and nums[i] == nums[i-1]:
                     continue
-                track.append(nums[i])
+                combination.append(nums[i])
                 backtrack(nums,i+1)
-                track.pop()
-        backtrack(nums,0)
-        return res
+                combination.pop()
+        backtrack(nums, 0)
+        return ls_res
 
 
 

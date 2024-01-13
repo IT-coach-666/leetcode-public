@@ -14,17 +14,16 @@ type_jy = "S"
 # jy: 记录该题的英文简称以及所属类别
 title_jy = "Maximum-Depth-of-Binary-Tree(tree)"
 # jy: 记录不同解法思路的关键词
-tag_jy = ""
+tag_jy = "递归 | 循环/迭代"
 
 
 """
-Given a binary tree, find its maximum depth. The maximum depth is the number
-of nodes along the longest path from the root node down to the farthest leaf node.
+Given the `root` of a binary tree, return its maximum depth. A binary tree's
+maximum depth is the number of nodes along the longest path from the root 
+node down to the farthest leaf node.
 
-Note: A leaf is a node with no children.
 
-
-Example:
+Example 1:
 Given binary tree [3, 9, 20, null, null, 15, 7],
     3
    / \
@@ -32,16 +31,28 @@ Given binary tree [3, 9, 20, null, null, 15, 7],
     /  \
    15   7
 return its depth = 3.
+
+
+Example 2:
+Input: root = [1, null, 2]
+Output: 2
+ 
+
+Constraints:
+1) The number of nodes in the tree is in the range [0, 10^4].
+2) -100 <= Node.val <= 100
 """
 
 
 from collections import deque
-from about_TreeNode import *
+from leetcode_jy.utils_jy.about_TreeNode import TreeNode, build_binary_tree
 
 
 class Solution:
     """
-解法1: 分别递归求解左右子树的高度, 返回两者的最大值加 1 即可
+解法 1: 递归
+
+递归求解左右子树的高度, 返回两者的最大值加 1
     """
     def maxDepth_v1(self, root: TreeNode) -> int:
         if not root:
@@ -52,7 +63,9 @@ class Solution:
 
 
     """
-解法2: 广度优先搜索; 使用一个队列存储每一层的结点, 每次出队一层的结点, 同时树的深度加 1;
+解法 2: 基于树的层级遍历
+
+树的总层数即为树的最大高度
     """
     def maxDepth_v2(self, root: TreeNode) -> int:
         queue = deque([root]) if root else deque()
@@ -60,7 +73,6 @@ class Solution:
         while queue:
             depth += 1
             size = len(queue)
-            # jy: 一次 for 循环出队一层的节点, 并将下一层的节点入队;
             for _ in range(size):
                 node = queue.popleft()
                 if node.left:
@@ -72,11 +84,12 @@ class Solution:
 
 ls_ = [3, 9, 20, None, None, 15, 7]
 root = build_binary_tree(ls_)
-
 res = Solution().maxDepth_v1(root)
 print(res)
 
+
+ls_ = [1, None, 2]
+root = build_binary_tree(ls_)
 res = Solution().maxDepth_v2(root)
 print(res)
-
 
